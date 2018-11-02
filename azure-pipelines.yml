@@ -1,58 +1,145 @@
-pool: 
-  vmImage: 'Ubuntu 16.04'
+jobs:
+- job: Windows
+  pool: 
+    vmImage: 'vs2017-win2016'
 
-steps:
+  steps:
+    - script: |
+      cl ./tools/chksum64.c
+      cl ./tools/n64tool.c
+      cl ./tools/dumpdfs/dumpdfs.c
+      cl ./tools/mkdfs/mkdfs.c
+      #below required libpng (http://gnuwin32.sourceforge.net/packages/libpng.htm) need to work out how!
+      #cl ./tools/mksprite/mksprite.c
+      #cl ./tools/mksprite/convtool.c
+    displayName: 'Build tools'
+    continueOnError: false
 
-- bash: |
-    mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/
-    mv "$BUILD_SOURCESDIRECTORY/scripts/build/libdragon-linux64.tar.gz" "$BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/"
-    mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/win64/
-    mv "$BUILD_SOURCESDIRECTORY/scripts/build/libdragon-win64.zip" "$BUILD_ARTIFACTSTAGINGDIRECTORY/win64/"
-  displayName: 'Move Artifacts to Staging Directory'
-  continueOnError: false
+  - script: |
+      vsts package universal download \
+      --instance "https://dev.azure.com/n64-tools/" \
+      --feed "Releases" \
+      --name "gcc-toolchain-mips64-win64" \
+      --version "0.0.7" \
+      --path .
 
-# Publish build artifacts to Azure Artifacts/TFS or a file share
-- task: PublishBuildArtifacts@1
-  displayName: Publish Build Artifacts
-  inputs:
-    pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-    artifactName: 'binaries' 
-    publishLocation: 'Container' # Options: container, filePath
-    #targetPath: # Required when publishLocation == FilePath
-    parallel: true # Optional
-    #parallelCount: # Optional
+      [System.IO.Compression.ZipFile]::ExtractToDirectory(gcc-toolchain-mips64-win64.zip, gcc-toolchain-mips64)
 
-#TODO: should only publish to feed when on master branch!!!
-- task: UniversalPackages@0
-  displayName: Universal Publish Linux Package
-  inputs:
-    command: publish
-    publishDirectory: '$(Build.ArtifactStagingDirectory)/linux64/'
-    vstsFeedPublish: 'Releases'
-    vstsFeedPackagePublish: 'libdragon-linux64'
-    packagePublishDescription: 'Libdragon SDK for the N64 compatible with Linux'
-    #versionOption: custom
-    #versionPublish: <Package version>
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      Write-Host '##vso[task.setvariable variable=gcc.dir]abc'
+    displayName: 'Install cross compiler'
+    continueOnError: false
 
-- task: UniversalPackages@0
-  displayName: Universal Publish Windows Package
-  inputs:
-    command: publish
-    publishDirectory: '$(Build.ArtifactStagingDirectory)/win64/'
-    vstsFeedPublish: 'Releases'
-    vstsFeedPackagePublish: 'libdragon-win64'
-    packagePublishDescription: 'Libdragon SDK for the N64 compatible with Windows'
-    #versionOption: custom
-    #versionPublish: <Package version>
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
-- bash: |
-    curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/libdragon-linux64.tar.gz -u$USER:$KEY https://api.bintray.com/content/n64-tools/libgragon/binaries/$BUILD_BUILDNUMBER/libdragon-linux64-$BUILD_BUILDNUMBER.tar.gz;publish=1;
-    curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/win64/libdragon-win64.zip -u$USER:$KEY https://api.bintray.com/content/n64-tools/libdragon/binaries/$BUILD_BUILDNUMBER/libdragon-win64-$BUILD_BUILDNUMBER.zip;publish=1;
-  env:
-    USER: $(BinTrayUser)
-    KEY: $(BinTrayKey)
-  displayName: 'Upload to Bintray'
-  continueOnError: false
-  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+  - bash: |
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/
+      mv "$BUILD_SOURCESDIRECTORY/scripts/build/libdragon-linux64.tar.gz" "$BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/"
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/win64/
+      mv "$BUILD_SOURCESDIRECTORY/scripts/build/libdragon-win64.zip" "$BUILD_ARTIFACTSTAGINGDIRECTORY/win64/"
+    displayName: 'Move Artifacts to Staging Directory'
+    continueOnError: false
+
+  # Publish build artifacts to Azure Artifacts/TFS or a file share
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Build Artifacts
+    inputs:
+      pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'binaries' 
+      publishLocation: 'Container' # Options: container, filePath
+      #targetPath: # Required when publishLocation == FilePath
+      parallel: true # Optional
+      #parallelCount: # Optional
+
+  #TODO: should only publish to feed when on master branch!!!
+  - task: UniversalPackages@0
+    displayName: Universal Publish Linux Package
+    inputs:
+      command: publish
+      publishDirectory: '$(Build.ArtifactStagingDirectory)/linux64/'
+      vstsFeedPublish: 'Releases'
+      vstsFeedPackagePublish: 'libdragon-linux64'
+      packagePublishDescription: 'Libdragon SDK for the N64 compatible with Linux'
+      #versionOption: custom
+      #versionPublish: <Package version>
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+  - task: UniversalPackages@0
+    displayName: Universal Publish Windows Package
+    inputs:
+      command: publish
+      publishDirectory: '$(Build.ArtifactStagingDirectory)/win64/'
+      vstsFeedPublish: 'Releases'
+      vstsFeedPackagePublish: 'libdragon-win64'
+      packagePublishDescription: 'Libdragon SDK for the N64 compatible with Windows'
+      #versionOption: custom
+      #versionPublish: <Package version>
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+  - bash: |
+      curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/libdragon-linux64.tar.gz -u$USER:$KEY https://api.bintray.com/content/n64-tools/libgragon/binaries/$BUILD_BUILDNUMBER/libdragon-linux64-$BUILD_BUILDNUMBER.tar.gz;publish=1;
+      curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/win64/libdragon-win64.zip -u$USER:$KEY https://api.bintray.com/content/n64-tools/libdragon/binaries/$BUILD_BUILDNUMBER/libdragon-win64-$BUILD_BUILDNUMBER.zip;publish=1;
+    env:
+      USER: $(BinTrayUser)
+      KEY: $(BinTrayKey)
+    displayName: 'Upload to Bintray'
+    continueOnError: false
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+- job: Linux
+  pool: 
+    vmImage: 'Ubuntu 16.04'
+
+  steps:
+
+  - bash: |
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/
+      mv "$BUILD_SOURCESDIRECTORY/scripts/build/libdragon-linux64.tar.gz" "$BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/"
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/win64/
+      mv "$BUILD_SOURCESDIRECTORY/scripts/build/libdragon-win64.zip" "$BUILD_ARTIFACTSTAGINGDIRECTORY/win64/"
+    displayName: 'Move Artifacts to Staging Directory'
+    continueOnError: false
+
+  # Publish build artifacts to Azure Artifacts/TFS or a file share
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Build Artifacts
+    inputs:
+      pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'binaries' 
+      publishLocation: 'Container' # Options: container, filePath
+      #targetPath: # Required when publishLocation == FilePath
+      parallel: true # Optional
+      #parallelCount: # Optional
+
+  #TODO: should only publish to feed when on master branch!!!
+  - task: UniversalPackages@0
+    displayName: Universal Publish Linux Package
+    inputs:
+      command: publish
+      publishDirectory: '$(Build.ArtifactStagingDirectory)/linux64/'
+      vstsFeedPublish: 'Releases'
+      vstsFeedPackagePublish: 'libdragon-linux64'
+      packagePublishDescription: 'Libdragon SDK for the N64 compatible with Linux'
+      #versionOption: custom
+      #versionPublish: <Package version>
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+  - task: UniversalPackages@0
+    displayName: Universal Publish Windows Package
+    inputs:
+      command: publish
+      publishDirectory: '$(Build.ArtifactStagingDirectory)/win64/'
+      vstsFeedPublish: 'Releases'
+      vstsFeedPackagePublish: 'libdragon-win64'
+      packagePublishDescription: 'Libdragon SDK for the N64 compatible with Windows'
+      #versionOption: custom
+      #versionPublish: <Package version>
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+  - bash: |
+      curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/libdragon-linux64.tar.gz -u$USER:$KEY https://api.bintray.com/content/n64-tools/libgragon/binaries/$BUILD_BUILDNUMBER/libdragon-linux64-$BUILD_BUILDNUMBER.tar.gz;publish=1;
+      curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/win64/libdragon-win64.zip -u$USER:$KEY https://api.bintray.com/content/n64-tools/libdragon/binaries/$BUILD_BUILDNUMBER/libdragon-win64-$BUILD_BUILDNUMBER.zip;publish=1;
+    env:
+      USER: $(BinTrayUser)
+      KEY: $(BinTrayKey)
+    displayName: 'Upload to Bintray'
+    continueOnError: false
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))

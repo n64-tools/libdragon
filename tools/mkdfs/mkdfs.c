@@ -10,7 +10,7 @@
 #include <dirent.h>
 #include <sys/param.h>
 #else
-#include <windows.h>
+#include "dirent.h"
 #endif // !_MSC_VER
 
 #include "dragonfs.h"

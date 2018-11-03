@@ -4,6 +4,12 @@ jobs:
     vmImage: 'vs2017-win2016'
   steps:
   - script: |
+      curl https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h
+      curl http://downloads.sourceforge.net/gnuwin32/libpng-1.2.37-bin.zip --output libpng.zip
+    displayName: 'Get dependencies'
+    continueOnError: false
+
+  - script: |
       call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
 
       cl ./tools/chksum64.c
@@ -11,8 +17,9 @@ jobs:
       cl ./tools/dumpdfs/dumpdfs.c -I ./include/
       cl ./tools/mkdfs/mkdfs.c -I ./include/
       ::below required libpng (http://gnuwin32.sourceforge.net/packages/libpng.htm) need to work out how!
-      ::http://downloads.sourceforge.net/gnuwin32/libpng-1.2.37-bin.zip
-      ::[System.IO.Compression.ZipFile]::ExtractToDirectory(libpng-1.2.37-bin.zip, libpng-1.2.37-bin)
+      [System.IO.Compression.ZipFile]::ExtractToDirectory(libpng.zip, libpng)
+      cd libpng
+      dir
       ::cl ./tools/mksprite/convtool.c
       ::cl ./tools/mksprite/mksprite.c
     displayName: 'Build Tools'

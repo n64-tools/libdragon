@@ -146,7 +146,7 @@ int read_png( char *png_file, char *spr_file, int depth, int hslices, int vslice
     /* Keep the variably sized array scoped so we can goto past it */
     {
         /* The easiest way to read the image (all at once) */
-        png_bytep row_pointers[malloc(height)];
+        png_bytep *row_pointers = malloc(height);
         memset( row_pointers, 0, sizeof( png_bytep ) * height );
 
         for( int row = 0; row < height; row++ )

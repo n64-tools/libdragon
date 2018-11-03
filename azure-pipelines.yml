@@ -3,7 +3,18 @@ jobs:
   pool:
     vmImage: 'vs2017-win2016'
   steps:
-  - script: echo hello from Windows
+  - script: |
+    cl ./tools/chksum64.c
+    cl ./tools/n64tool.c
+    cl ./tools/dumpdfs/dumpdfs.c
+    cl ./tools/mkdfs/mkdfs.c
+    #below required libpng (http://gnuwin32.sourceforge.net/packages/libpng.htm) need to work out how!
+    #http://downloads.sourceforge.net/gnuwin32/libpng-1.2.37-bin.zip
+    #[System.IO.Compression.ZipFile]::ExtractToDirectory(libpng-1.2.37-bin.zip, libpng-1.2.37-bin)
+    #cl ./tools/mksprite/convtool.c
+    #cl ./tools/mksprite/mksprite.c
+  displayName: 'Build Tools'
+  continueOnError: false
 
   
 - job: Linux

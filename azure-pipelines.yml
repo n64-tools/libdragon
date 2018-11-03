@@ -3,6 +3,23 @@ jobs:
   pool:
     vmImage: 'vs2017-win2016'
   steps:
+
+  - script: |
+    vsts package universal download \
+    --instance "https://dev.azure.com/n64-tools/" \
+    --feed "Releases" \
+    --name "gcc-toolchain-mips64-win64" \
+    --version "0.0.7" \
+    --path .
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: 'gcc-toolchain-mips64-win64.zip' 
+      destinationFolder: gcc-toolchain-mips64
+      cleanDestinationFolder: false 
+    displayName: 'Extract gcc-toolchain-mips64-win64'
+    continueOnError: false
+
   - script: |
       curl https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h
       curl https://windows.php.net/downloads/php-sdk/deps-7.1-vc14-x64.7z --output php-sdk.7z
@@ -14,7 +31,7 @@ jobs:
       archiveFilePatterns: 'php-sdk.7z' 
       destinationFolder: php-sdk
       cleanDestinationFolder: false 
-    displayName: 'Extract dependencies'
+    displayName: 'Extract php-sdk'
     continueOnError: false
 
   - script: |

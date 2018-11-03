@@ -9,6 +9,11 @@ jobs:
     displayName: 'Get dependencies'
     continueOnError: false
 
+  - powershell: |
+      [System.IO.Compression.ZipFile]::ExtractToDirectory(libpng.zip, libpng)
+    displayName: 'Extract dependencies'
+    continueOnError: false
+
   - script: |
       call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
 
@@ -16,12 +21,11 @@ jobs:
       cl ./tools/n64tool.c
       cl ./tools/dumpdfs/dumpdfs.c -I ./include/
       cl ./tools/mkdfs/mkdfs.c -I ./include/
-      ::below required libpng (http://gnuwin32.sourceforge.net/packages/libpng.htm) need to work out how!
-      [System.IO.Compression.ZipFile]::ExtractToDirectory(libpng.zip, libpng)
+      cl ./tools/mksprite/convtool.c
+      cl ./tools/mksprite/mksprite.c I ./libpng/include/
+
       cd libpng
       dir
-      ::cl ./tools/mksprite/convtool.c
-      ::cl ./tools/mksprite/mksprite.c
     displayName: 'Build Tools'
     continueOnError: false
 

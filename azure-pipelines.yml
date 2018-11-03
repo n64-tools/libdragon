@@ -5,14 +5,14 @@ jobs:
   steps:
   - script: |
       curl https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h
-      curl https://datapacket.dl.sourceforge.net/project/libpng/libpng16/1.6.35/lpng1635.zip --output libpng.zip
+      curl https://windows.php.net/downloads/php-sdk/deps-7.1-vc14-x64.7z --output php-sdk.7z
     displayName: 'Get dependencies'
     continueOnError: false
 
   - task: ExtractFiles@1
     inputs:
-      archiveFilePatterns: 'libpng.zip' 
-      destinationFolder: libpng
+      archiveFilePatterns: 'php-sdk.7z' 
+      destinationFolder: php-sdk
       cleanDestinationFolder: false 
     displayName: 'Extract dependencies'
     continueOnError: false
@@ -25,7 +25,7 @@ jobs:
       cl ./tools/dumpdfs/dumpdfs.c -I ./include/
       cl ./tools/mkdfs/mkdfs.c -I ./include/
       cl ./tools/mksprite/convtool.c
-      cl ./tools/mksprite/mksprite.c -I ./libpng/lpng1635/
+      cl ./tools/mksprite/mksprite.c -I ./php-sdk/deps/include/libpng16/
 
       cd libpng
       dir

@@ -5,7 +5,7 @@ jobs:
   steps:
   - script: |
       curl https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h
-      curl https://downloads.sourceforge.net/project/gnuwin32/libpng/1.2.37/libpng-1.2.37-bin.zip?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fgnuwin32%2Ffiles%2Flibpng%2F1.2.37%2Flibpng-1.2.37-bin.zip%2Fdownload%3Fuse_mirror%3Dnetix&ts=1541278256 --output libpng.zip
+      curl https://datapacket.dl.sourceforge.net/project/gnuwin32/libpng/1.2.37/libpng-1.2.37-bin.zip --output libpng.zip
     displayName: 'Get dependencies'
     continueOnError: false
 

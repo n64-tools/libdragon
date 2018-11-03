@@ -5,12 +5,14 @@ jobs:
   steps:
 
   - script: |
-    vsts package universal download \
-    --instance "https://dev.azure.com/n64-tools/" \
-    --feed "Releases" \
-    --name "gcc-toolchain-mips64-win64" \
-    --version "0.0.7" \
-    --path .
+      vsts package universal download \
+      --instance "https://dev.azure.com/n64-tools/" \
+      --feed "Releases" \
+      --name "gcc-toolchain-mips64-win64" \
+      --version "0.0.7" \
+      --path .
+    displayName: 'Extract gcc-toolchain-mips64-win64'
+    continueOnError: false
 
   - task: ExtractFiles@1
     inputs:
@@ -42,7 +44,7 @@ jobs:
       cl ./tools/dumpdfs/dumpdfs.c -I ./include/
       cl ./tools/mkdfs/mkdfs.c -I ./include/
       cl ./tools/mksprite/convtool.c
-      cl ./tools/mksprite/mksprite.c libpng.lib /link /LIBPATH:./php-sdk/deps/lib/ -I ./php-sdk/deps/include/libpng16/
+      cl ./tools/mksprite/mksprite.c ./php-sdk/deps/lib/libpng.lib -I ./php-sdk/deps/include/libpng16/ /link
 
     displayName: 'Build Tools'
     continueOnError: false

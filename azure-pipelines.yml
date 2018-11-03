@@ -9,8 +9,11 @@ jobs:
     displayName: 'Get dependencies'
     continueOnError: false
 
-  - powershell: |
-      [System.IO.Compression.ZipFile]::ExtractToDirectory("libpng.zip", "libpng")
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: 'libpng.zip' 
+      #destinationFolder: 
+      #cleanDestinationFolder: true 
     displayName: 'Extract dependencies'
     continueOnError: false
 

@@ -32,10 +32,10 @@ jobs:
 
   - bash: |
       mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/tools/
-      cp "$BUILD_SOURCESDIRECTORY/*.exe" "$BUILD_ARTIFACTSTAGINGDIRECTORY/tools/"
+      cp "$BUILD_SOURCESDIRECTORY/"*.exe "$BUILD_ARTIFACTSTAGINGDIRECTORY/tools/"
 
       mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/include/
-      cp "$BUILD_SOURCESDIRECTORY/include/*" "$BUILD_ARTIFACTSTAGINGDIRECTORY/include/"
+      cp "$BUILD_SOURCESDIRECTORY/include/"* "$BUILD_ARTIFACTSTAGINGDIRECTORY/include/"
     displayName: 'Move Artifacts to Staging Directory'
     continueOnError: false
 

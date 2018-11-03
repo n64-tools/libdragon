@@ -1,14 +1,16 @@
 #include <stdio.h>
 #include <malloc.h>
-#include <dirent.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
 #include <stdint.h>
 #include <sys/types.h>
-#include <sys/param.h>
 #include "dragonfs.h"
 #include "dfsinternal.h"
+#ifndef _MSC_VER
+#include <dirent.h>
+#include <sys/param.h>
+#endif // !_MSC_VER
 
 #if BYTE_ORDER == BIG_ENDIAN
 #define SWAPLONG(i) (i)

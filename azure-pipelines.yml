@@ -4,7 +4,7 @@ jobs:
     vmImage: 'vs2017-win2016'
   steps:
   - script: |
-      @%comspec% /k " cd /d "%~dp0..\.." & "%~dp0vsdevcmd.bat" "
+      @%comspec% /k " "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\Common7\Tools\vsdevcmd.bat" "
       cl ./tools/chksum64.c
       cl ./tools/n64tool.c
       cl ./tools/dumpdfs/dumpdfs.c

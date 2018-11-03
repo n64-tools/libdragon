@@ -5,7 +5,7 @@ jobs:
   steps:
   - script: |
       curl https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h
-      curl https://datapacket.dl.sourceforge.net/project/gnuwin32/libpng/1.2.37/libpng-1.2.37-bin.zip --output libpng.zip
+      curl https://datapacket.dl.sourceforge.net/project/libpng/libpng16/1.6.35/lpng1635.zip --output libpng.zip
     displayName: 'Get dependencies'
     continueOnError: false
 
@@ -25,7 +25,7 @@ jobs:
       cl ./tools/dumpdfs/dumpdfs.c -I ./include/
       cl ./tools/mkdfs/mkdfs.c -I ./include/
       cl ./tools/mksprite/convtool.c
-      cl ./tools/mksprite/mksprite.c I ./libpng/include/
+      cl ./tools/mksprite/mksprite.c -I ./libpng/lpng1635/
 
       cd libpng
       dir

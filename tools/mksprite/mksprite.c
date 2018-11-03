@@ -96,7 +96,7 @@ int read_png( char *png_file, char *spr_file, int depth, int hslices, int vslice
     png_read_info(png_ptr, info_ptr);
     png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, &interlace_type, NULL, NULL);
 
-    /* Write sprite header widht and height */
+    /* Write sprite header width and height */
     wval16 = SWAP_WORD((uint16_t)width);
     fwrite( &wval16, sizeof( wval16 ), 1, op );
     wval16 = SWAP_WORD((uint16_t)height);
@@ -144,9 +144,10 @@ int read_png( char *png_file, char *spr_file, int depth, int hslices, int vslice
     bit_depth = png_get_bit_depth(png_ptr, info_ptr);
 
     /* Keep the variably sized array scoped so we can goto past it */
+    /* The easiest way to read the image (all at once) */
+    png_bytep row_pointers[height];
     {
-        /* The easiest way to read the image (all at once) */
-        png_bytep row_pointers[height];
+        
         memset( row_pointers, 0, sizeof( png_bytep ) * height );
 
         for( int row = 0; row < height; row++ )

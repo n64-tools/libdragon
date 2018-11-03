@@ -27,8 +27,6 @@ jobs:
       cl ./tools/mksprite/convtool.c
       cl ./tools/mksprite/mksprite.c -I ./php-sdk/deps/include/libpng16/
 
-      cd libpng
-      dir
     displayName: 'Build Tools'
     continueOnError: false
 

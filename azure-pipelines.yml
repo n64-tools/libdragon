@@ -10,7 +10,7 @@ jobs:
     continueOnError: false
 
   - powershell: |
-      [System.IO.Compression.ZipFile]::ExtractToDirectory(libpng.zip, libpng)
+      [System.IO.Compression.ZipFile]::ExtractToDirectory("libpng.zip", "libpng")
     displayName: 'Extract dependencies'
     continueOnError: false
 

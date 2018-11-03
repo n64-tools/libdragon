@@ -12,8 +12,8 @@ jobs:
   - task: ExtractFiles@1
     inputs:
       archiveFilePatterns: 'libpng.zip' 
-      #destinationFolder: 
-      #cleanDestinationFolder: true 
+      destinationFolder: libpng
+      cleanDestinationFolder: false 
     displayName: 'Extract dependencies'
     continueOnError: false
 

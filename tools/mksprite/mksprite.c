@@ -5,7 +5,9 @@
 #include <errno.h>
 #include <png.h>
 #include <sys/types.h>
+#ifndef _MSC_VER
 #include <sys/param.h>
+#endif // !_MSC_VER
 
 #define BITDEPTH_16BPP      16
 #define BITDEPTH_32BPP      32

@@ -9,6 +9,8 @@
 #ifndef _MSC_VER
 #include <dirent.h>
 #include <sys/param.h>
+#else
+#include <windows.h>
 #endif // !_MSC_VER
 
 #include "dragonfs.h"

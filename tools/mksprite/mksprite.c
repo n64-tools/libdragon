@@ -144,10 +144,9 @@ int read_png( char *png_file, char *spr_file, int depth, int hslices, int vslice
     bit_depth = png_get_bit_depth(png_ptr, info_ptr);
 
     /* Keep the variably sized array scoped so we can goto past it */
-    /* The easiest way to read the image (all at once) */
-    png_bytep row_pointers[height];
     {
-        
+        /* The easiest way to read the image (all at once) */
+        png_bytep row_pointers[malloc(height)];
         memset( row_pointers, 0, sizeof( png_bytep ) * height );
 
         for( int row = 0; row < height; row++ )

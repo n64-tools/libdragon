@@ -4,6 +4,7 @@ jobs:
     vmImage: 'vs2017-win2016'
   steps:
   - script: |
+      @%comspec% /k " cd /d "%~dp0..\.." & "%~dp0vsdevcmd.bat" "
       cl ./tools/chksum64.c
       cl ./tools/n64tool.c
       cl ./tools/dumpdfs/dumpdfs.c
@@ -13,8 +14,8 @@ jobs:
       #[System.IO.Compression.ZipFile]::ExtractToDirectory(libpng-1.2.37-bin.zip, libpng-1.2.37-bin)
       #cl ./tools/mksprite/convtool.c
       #cl ./tools/mksprite/mksprite.c
-  displayName: 'Build Tools'
-  continueOnError: false
+    displayName: 'Build Tools'
+    continueOnError: false
 
   
 - job: Linux

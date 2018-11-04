@@ -92,6 +92,16 @@ jobs:
     vmImage: 'ubuntu-16.04'
   steps:
   - bash: |
+      export N64_INST = $BUILD_ARTIFACTSTAGINGDIRECTORY
+      make tools
+      make tools-install
+      ls
+
+      cd $BUILD_ARTIFACTSTAGINGDIRECTORY
+      ls
+    displayName: 'Build Tools'
+    continueOnError: false
+  - bash: |
       mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/
       mv "$BUILD_SOURCESDIRECTORY/scripts/build/libdragon-linux64.tar.gz" "$BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/"
     displayName: 'Move Artifacts to Staging Directory'

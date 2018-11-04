@@ -44,7 +44,7 @@ jobs:
       cl .\tools\dumpdfs\dumpdfs.c -I .\include\
       cl .\tools\mkdfs\mkdfs.c -I .\include\
       cl .\tools\mksprite\convtool.c
-      cl /MT .\tools\mksprite\mksprite.c .\php-sdk\deps\lib\libpng.lib -I .\php-sdk\deps\include\libpng16\ /link 
+      cl /MT .\tools\mksprite\mksprite.c .\php-sdk\deps\lib\libpng.lib /I .\php-sdk\deps\include\libpng16\ /link 
 
     displayName: 'Build Tools'
     continueOnError: false
@@ -52,6 +52,7 @@ jobs:
   - bash: |
       mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/tools/
       cp "$BUILD_SOURCESDIRECTORY/"*.exe "$BUILD_ARTIFACTSTAGINGDIRECTORY/tools/"
+      cp "$BUILD_SOURCESDIRECTORY/deps/bin/libpng.dll" "$BUILD_ARTIFACTSTAGINGDIRECTORY/tools/"
 
       mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/include/
       cp "$BUILD_SOURCESDIRECTORY/include/"* "$BUILD_ARTIFACTSTAGINGDIRECTORY/include/"

@@ -44,7 +44,7 @@ jobs:
       cl .\tools\dumpdfs\dumpdfs.c -I .\include\
       cl .\tools\mkdfs\mkdfs.c -I .\include\
       cl .\tools\mksprite\convtool.c
-      cl -I ".\php-sdk\deps\include\libpng16\" ".\tools\mksprite\mksprite.c" /link /LIBPATH:".\php-sdk\deps\lib\"
+      cl /MT .\tools\mksprite\mksprite.c .\php-sdk\deps\lib\libpng.lib -I .\php-sdk\deps\include\libpng16\ /link 
 
     displayName: 'Build Tools'
     continueOnError: false

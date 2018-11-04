@@ -4,23 +4,23 @@ jobs:
     vmImage: 'vs2017-win2016'
   steps:
 
-  - script: |
-      vsts package universal download \
-      --instance "https://dev.azure.com/n64-tools/" \
-      --feed "Releases" \
-      --name "gcc-toolchain-mips64-win64" \
-      --version "0.0.7" \
-      --path .
-    displayName: 'Extract gcc-toolchain-mips64-win64'
-    continueOnError: false
+  # - script: |
+  #     vsts package universal download \
+  #     --instance "https://dev.azure.com/n64-tools/" \
+  #     --feed "Releases" \
+  #     --name "gcc-toolchain-mips64-win64" \
+  #     --version "0.0.7" \
+  #     --path .
+  #   displayName: 'Extract gcc-toolchain-mips64-win64'
+  #   continueOnError: false
 
-  - task: ExtractFiles@1
-    inputs:
-      archiveFilePatterns: 'gcc-toolchain-mips64-win64.zip' 
-      destinationFolder: gcc-toolchain-mips64
-      cleanDestinationFolder: false 
-    displayName: 'Extract gcc-toolchain-mips64-win64'
-    continueOnError: false
+  # - task: ExtractFiles@1
+  #   inputs:
+  #     archiveFilePatterns: 'gcc-toolchain-mips64-win64.zip' 
+  #     destinationFolder: gcc-toolchain-mips64
+  #     cleanDestinationFolder: false 
+  #   displayName: 'Extract gcc-toolchain-mips64-win64'
+  #   continueOnError: false
 
   - script: |
       curl https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h

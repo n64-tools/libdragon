@@ -8,6 +8,7 @@ jobs:
       azureSubscription: 
       scriptLocation: 'inlineScript'
       inlineScript: |
+        vsts configure -d instance=https://dev.azure.com/n64-tools
         vsts package universal download \
         --instance "https://dev.azure.com/n64-tools/" \
         --feed "Releases" \

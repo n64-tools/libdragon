@@ -3,21 +3,12 @@ jobs:
   pool:
     vmImage: 'vs2017-win2016'
   steps:
-  - task: AzureCLI@1
-    inputs:
-      scriptLocation: 'inlineScript'
-      inlineScript: |
-        vsts configure -d instance=https://dev.azure.com/n64-tools
-        vsts package universal download \
-        --instance "https://dev.azure.com/n64-tools/" \
-        --feed "Releases" \
-        --name "gcc-toolchain-mips64-win64" \
-        --version "0.0.7" \
-        --path .
-      #arguments: # Optional
-      #workingDirectory: # Optional
-      #failOnStandardError: false # Optional
-    displayName: 'Extract gcc-toolchain-mips64-win64'
+
+  - script: |
+      curl https://bintray.com/n64-tools/mips64-gcc-toolchain/download_file?file_path=gcc-toolchain-mips64-win64-8.1.0-20181031.7.zip --output gcc-toolchain-mips64-win64.zip
+      curl https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h
+      curl https://windows.php.net/downloads/php-sdk/deps-7.1-vc14-x64.7z --output php-sdk.7z
+    displayName: 'Get dependencies'
     continueOnError: false
 
   - task: ExtractFiles@1
@@ -26,12 +17,6 @@ jobs:
       destinationFolder: gcc-toolchain-mips64
       cleanDestinationFolder: false 
     displayName: 'Extract gcc-toolchain-mips64-win64'
-    continueOnError: false
-
-  - script: |
-      curl https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h
-      curl https://windows.php.net/downloads/php-sdk/deps-7.1-vc14-x64.7z --output php-sdk.7z
-    displayName: 'Get dependencies'
     continueOnError: false
 
   - task: ExtractFiles@1

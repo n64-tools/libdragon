@@ -5,9 +5,9 @@ jobs:
   steps:
 
   - script: |
-      curl https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-win64-8.1.0-20181031.7.zip --output gcc-toolchain-mips64-win64.zip
-      curl https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h
-      curl https://windows.php.net/downloads/php-sdk/deps-7.1-vc14-x64.7z --output php-sdk.7z
+      curl -L https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-win64-8.1.0-20181031.7.zip --output gcc-toolchain-mips64-win64.zip
+      curl -L https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h
+      curl -L https://windows.php.net/downloads/php-sdk/deps-7.1-vc14-x64.7z --output php-sdk.7z
     displayName: 'Get dependencies'
     continueOnError: false
 
@@ -38,6 +38,11 @@ jobs:
       cl /MT .\tools\mksprite\mksprite.c .\php-sdk\deps\lib\libpng.lib /I .\php-sdk\deps\include\libpng16\ /link 
 
     displayName: 'Build Tools'
+    continueOnError: false
+
+  - script: |
+
+    displayName: 'Build SDK'
     continueOnError: false
 
   - bash: |

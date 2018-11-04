@@ -5,7 +5,6 @@ jobs:
   steps:
   - task: AzureCLI@1
     inputs:
-      azureSubscription: 
       scriptLocation: 'inlineScript'
       inlineScript: |
         vsts configure -d instance=https://dev.azure.com/n64-tools

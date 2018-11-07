@@ -93,10 +93,16 @@ jobs:
   steps:
 
   - bash: |
-      sudo apt-get update
-      sudo apt-get -y upgrade
+      
+      sudo add-apt-repository ppa:jonathonf/gcc -y
+      sudo apt-get -qq update
+
+      sudo apt-get install -y build-essential software-properties-common
+      sudo apt-get install -y gcc-8 binutils
+      #sudo apt-get update
+      #sudo apt-get -y upgrade
       # Install essential packages [sudo req.]
-      sudo apt-get -y install build-essential git texinfo libc6 libgmp-dev libmpfr-dev libmpc-dev libpng-dev zlib1g-dev libtool autoconf
+      #sudo apt-get -y install build-essential git texinfo libc6 libgmp-dev libmpfr-dev libmpc-dev libpng-dev zlib1g-dev libtool autoconf
     displayName: 'Setup Environment'
     continueOnError: false
   

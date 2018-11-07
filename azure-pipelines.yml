@@ -31,6 +31,8 @@ jobs:
       sed -i -- 's|ROOTDIR = $(N64_INST)|ROOTDIR = $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64|g' $BUILD_SOURCESDIRECTORY/Makefile
       sed -i -- 's|rm -f *.o *.a|DEL /F *.o *.a|g' $BUILD_SOURCESDIRECTORY/Makefile
       sed -i -- 's|rm -rf $(CURDIR)/build|RD /S /Q $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/Makefile
+
+      sed -i -- 's|if not exist $(CURDIR)/build mkdir $(CURDIR)/build|mkdir -p $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/files.in
     displayName: 'Adjust Make Files for Windows'
     continueOnError: false
 

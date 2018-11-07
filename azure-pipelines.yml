@@ -42,6 +42,8 @@ jobs:
 
       cat $BUILD_SOURCESDIRECTORY/Makefile
       echo .
+      echo .
+      echo .
       cat $BUILD_SOURCESDIRECTORY/files.in
     displayName: 'Adjust Make Files for Windows'
     continueOnError: false
@@ -57,7 +59,7 @@ jobs:
       cl /MT .\tools\mksprite\mksprite.c .\php-sdk\deps\lib\libpng.lib /I .\php-sdk\deps\include\libpng16\ /link 
      
       setx N64_INST "%BUILD_SOURCESDIRECTORY%/gcc-toolchain-mips64"
-      nmake -f Makefile libdragon
+      ::nmake -f Makefile libdragon
     displayName: 'Build SDK'
     continueOnError: false
 

@@ -92,6 +92,14 @@ jobs:
     vmImage: 'ubuntu-16.04'
   steps:
 
+  - bash: |
+      apt-get update
+      apt-get -y upgrade
+      # Install essential packages [sudo req.]
+      apt-get -y install build-essential git texinfo libc6 libgmp-dev libmpfr-dev libmpc-dev libpng-dev zlib1g-dev libtool autoconf
+    displayName: 'Setup Environment'
+    continueOnError: false
+  
   - script: |
       curl -L https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-linux64-8.1.0-20181031.7.tar.gz --output gcc-toolchain-mips64-linux64.tar.gz
     displayName: 'Get dependencies'

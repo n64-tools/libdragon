@@ -106,7 +106,7 @@ jobs:
     continueOnError: false
 
   - bash: |
-      export N64_INST="$BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64"
+      export N64_INST="$BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64/linux64"
 
       make tools
       make tools-install

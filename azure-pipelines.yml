@@ -5,7 +5,7 @@ jobs:
   steps:
 
   - script: |
-      curl -L https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-win64-8.1.0-20181031.7.zip --output gcc-toolchain-mips64-win64.zip
+      curl -L https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-win64-8.2.0-20181107.6.zip --output gcc-toolchain-mips64-win64.zip
       curl -L https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h
       curl -L https://windows.php.net/downloads/php-sdk/deps-7.1-vc14-x64.7z --output php-sdk.7z
     displayName: 'Get dependencies'
@@ -107,7 +107,7 @@ jobs:
     continueOnError: false
   
   - bash: |
-      curl -L https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-linux64-8.1.0-20181031.7.tar.gz --output gcc-toolchain-mips64-linux64.tar.gz
+      curl -L https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-linux64-8.2.0-20181107.6.tar.gz --output gcc-toolchain-mips64-linux64.tar.gz
       mkdir -p $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64
       sudo tar -C $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64 -xhzvf gcc-toolchain-mips64-linux64.tar.gz
     displayName: 'Get gcc-toolchain-mips64'
@@ -115,12 +115,12 @@ jobs:
     
 
   - bash: |      
-      export N64_INST="$BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64/linux64"
-      
+      export N64_INST="$BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64"
+      echo "the LD library paths are:"
       echo $LD_LIBRARY_PATH
-      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$N64_INST/x86_64-pc-linux-gnu
+      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$N64_INST/x86_64-pc-linux-gnu/mips64-elf/lib
       sudo ldconfig
- 
+      echo $LD_LIBRARY_PATH
 
       make tools
       make tools-install

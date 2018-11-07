@@ -28,7 +28,7 @@ jobs:
     continueOnError: false
 
   - bash: |
-      sed -i -- 's|ROOTDIR = $(N64_INST)|ROOTDIR = '"$BUILD_SOURCESDIRECTORY"'/gcc-toolchain-mips64|g' $BUILD_SOURCESDIRECTORY/Makefile
+      sed -i -- "s|ROOTDIR = $(N64_INST)|ROOTDIR = $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64|g" $BUILD_SOURCESDIRECTORY/Makefile
       sed -i -- 's|rm -f \*\.o \*\.a|DEL /F \*\.o \*\.a|g' $BUILD_SOURCESDIRECTORY/Makefile
       sed -i -- 's|rm -rf $(CURDIR)/build|RD /S /Q $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/Makefile
       sed -i -- 's|$(N64PREFIX)gcc|$(N64PREFIX)gcc.exe|g' $BUILD_SOURCESDIRECTORY/Makefile

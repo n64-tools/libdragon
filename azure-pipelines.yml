@@ -91,21 +91,37 @@ jobs:
   pool:
     vmImage: 'ubuntu-16.04'
   steps:
+
+  - script: |
+      curl -L https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-linux64-8.1.0-20181031.7.tar.gz --output gcc-toolchain-mips64-linux64.tar.gz
+    displayName: 'Get dependencies'
+    continueOnError: false
+    
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: 'gcc-toolchain-mips64-linux64.tar.gz' 
+      destinationFolder: gcc-toolchain-mips64
+      cleanDestinationFolder: false 
+    displayName: 'Extract gcc-toolchain-mips64-linux64'
+    continueOnError: false
+
   - bash: |
-      export N64_INST="$BUILD_ARTIFACTSTAGINGDIRECTORY"
+      export N64_INST="$BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64"
 
       make tools
       make tools-install
 
-      cd $N64_INST/bin
-      ls
-    displayName: 'Build Tools'
+      make
+      make install
+
+    displayName: 'Build SDK'
     continueOnError: false
-  # - bash: |
-  #     mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/
-  #     mv "$BUILD_SOURCESDIRECTORY/scripts/build/libdragon-linux64.tar.gz" "$BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/"
-  #   displayName: 'Move Artifacts to Staging Directory'
-  #   continueOnError: false
+  
+  - bash: |
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/gcc-toolchain-mips64/
+      cp -a $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64/. $BUILD_ARTIFACTSTAGINGDIRECTORY/gcc-toolchain-mips64/
+    displayName: 'Move Artifacts to Staging Directory'
+    continueOnError: false
 
   # Publish build artifacts to Azure Artifacts/TFS or a file share
   - task: PublishBuildArtifacts@1

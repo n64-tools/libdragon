@@ -27,6 +27,13 @@ jobs:
     displayName: 'Extract php-sdk'
     continueOnError: false
 
+  - bash: |
+      sed -i -- 's|ROOTDIR = $(N64_INST)|ROOTDIR = $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64|g' $BUILD_SOURCESDIRECTORY/Makefile
+      sed -i -- 's|rm -f *.o *.a|DEL /F *.o *.a|g' $BUILD_SOURCESDIRECTORY/Makefile
+      sed -i -- 's|rm -rf $(CURDIR)/build|RD /S /Q $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/Makefile
+    displayName: 'Adjust Make Files for Windows'
+    continueOnError: false
+
   - script: |
       call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
 
@@ -37,11 +44,7 @@ jobs:
       cl .\tools\mksprite\convtool.c
       cl /MT .\tools\mksprite\mksprite.c .\php-sdk\deps\lib\libpng.lib /I .\php-sdk\deps\include\libpng16\ /link 
 
-    displayName: 'Build Tools'
-    continueOnError: false
-
-  - script: |
-
+      nmake -f Makefile libdragon
     displayName: 'Build SDK'
     continueOnError: false
 
@@ -92,17 +95,12 @@ jobs:
     vmImage: 'ubuntu-16.04'
   steps:
 
-  - bash: |
-      
+  - bash: |   
       sudo add-apt-repository ppa:jonathonf/gcc -y
       sudo apt-get -qq update
 
       sudo apt-get install -y build-essential software-properties-common
       sudo apt-get install -y gcc-8 
-      #sudo apt-get update
-      #sudo apt-get -y upgrade
-      # Install essential packages [sudo req.]
-      #sudo apt-get -y install build-essential git texinfo libc6 libgmp-dev libmpfr-dev libmpc-dev libpng-dev zlib1g-dev libtool autoconf
     displayName: 'Setup Environment'
     continueOnError: false
   
@@ -116,18 +114,14 @@ jobs:
 
   - bash: |      
       export N64_INST="$BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64"
-      echo "the LD library paths are:"
-      echo $LD_LIBRARY_PATH
       export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$N64_INST/x86_64-pc-linux-gnu/mips64-elf/lib
       sudo ldconfig
-      echo $LD_LIBRARY_PATH
 
       make tools
       make tools-install
 
       make
       make install
-
     displayName: 'Build SDK'
     continueOnError: false
   

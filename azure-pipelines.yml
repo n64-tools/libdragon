@@ -120,7 +120,7 @@ jobs:
   #   continueOnError: false
 
   - bash: |
-      tar -xhzvf gcc-toolchain-mips64-linux64.tar.gz gcc-toolchain-mips64
+      sudo tar -C /gcc-toolchain-mips64 -xhzvf gcc-toolchain-mips64-linux64.tar.gz
       
       export N64_INST="$BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64/linux64"
 

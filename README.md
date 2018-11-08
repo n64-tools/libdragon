@@ -1,4 +1,5 @@
 Automatic build pipeline for Libdragon
+[![Build Status](https://dev.azure.com/n64-tools/N64-Tools/_apis/build/status/N64-tools.libdragon-sdk)](https://dev.azure.com/n64-tools/N64-Tools/_build/latest?definitionId=2)
 
 
 # libdragon

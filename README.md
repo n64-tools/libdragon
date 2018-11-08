@@ -1,5 +1,8 @@
+Automatic build pipeline for Libdragon
+
+
 # libdragon
-Libdragon with extended RDP features:
+The Conker64 version of Libdragon includes extended RDP features:
 - Sprite flip (Vertically, horizontally or both)
 - Sprite zooming (Scale X, Scale Y or both)
 - Sprite center align
@@ -12,7 +15,10 @@ Libdragon with extended RDP features:
 - Bug fixes on 32bit mode / textures
 - Some other fixes
 
+Conker64 Source:
+https://github.com/Conker64/libdragon | develop-conker64
+
 Original source:
 https://github.com/DragonMinded/libdragon
 
-Somes changes applied from Chillywilly's libdragon (2014-11-12)
+Somes changes applied from Chillywilly's libdragon (2014-11-12) | develop-dragonminded

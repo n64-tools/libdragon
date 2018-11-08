@@ -25,3 +25,7 @@ tools/n64tool
 *.tmp
 *.swp
 *~
+
+## Build Files
+*.obj
+*.exe

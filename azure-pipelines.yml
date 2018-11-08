@@ -93,7 +93,7 @@ jobs:
     displayName: Universal Publish Windows Package
     inputs:
       command: publish
-      publishDirectory: '$(Build.ArtifactStagingDirectory)/win64/'
+      publishDirectory: '$(Build.ArtifactStagingDirectory)'
       vstsFeedPublish: 'Releases'
       vstsFeedPackagePublish: 'libdragon-win64'
       packagePublishDescription: 'Libdragon SDK for the N64 compatible with Windows'
@@ -108,7 +108,7 @@ jobs:
       KEY: $(BinTrayKey)
     displayName: 'Upload to Bintray'
     continueOnError: false
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
   
 - job: Linux
   pool:
@@ -167,16 +167,16 @@ jobs:
     displayName: Universal Publish Linux Package
     inputs:
       command: publish
-      publishDirectory: '$(Build.ArtifactStagingDirectory)/linux64/'
+      publishDirectory: '$(Build.ArtifactStagingDirectory)'
       vstsFeedPublish: 'Releases'
       vstsFeedPackagePublish: 'libdragon-linux64'
       packagePublishDescription: 'Libdragon SDK for the N64 compatible with Linux'
       #versionOption: custom
       #versionPublish: <Package version>
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
 
   - bash: |
-      curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/libdragon-linux64.tar.gz -u$USER:$KEY https://api.bintray.com/content/n64-tools/libgragon/binaries/$BUILD_BUILDNUMBER/libdragon-linux64-$BUILD_BUILDNUMBER.tar.gz;publish=1;
+      curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/libdragon-linux64.tar.gz -u$USER:$KEY https://api.bintray.com/content/n64-tools/libgragon/binaries/$BUILD_BUILDNUMBER/libdragon-linux64-$BUILD_BUILDNUMBER.tar.gz;publish=1;
     env:
       USER: $(BinTrayUser)
       KEY: $(BinTrayKey)

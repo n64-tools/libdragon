@@ -58,8 +58,8 @@ jobs:
       cl .\tools\mksprite\convtool.c
       cl /MT .\tools\mksprite\mksprite.c .\php-sdk\deps\lib\libpng.lib /I .\php-sdk\deps\include\libpng16\ /link 
      
-      setx N64_INST "%BUILD_SOURCESDIRECTORY%/gcc-toolchain-mips64"
-      ::nmake -f Makefile libdragon
+      set N64_INST="%BUILD_SOURCESDIRECTORY%/gcc-toolchain-mips64"
+      nmake -f Makefile libdragon
     displayName: 'Build SDK'
     continueOnError: false
 

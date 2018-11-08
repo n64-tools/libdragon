@@ -96,23 +96,23 @@ static inline uint32_t get_size(directory_entry_t *dirent)
 /* Functions for easier traversal of directories */
 static inline directory_entry_t *get_first_entry(directory_entry_t *dirent)
 {
-    return (directory_entry_t *)(dirent->file_pointer ? (dirent->file_pointer + base_ptr) : 0);
+    return (directory_entry_t *)(dirent->file_pointer ? (dirent->file_pointer + (char*)base_ptr) : 0);
 }
 
 static inline directory_entry_t *get_next_entry(directory_entry_t *dirent)
 {
-    return (directory_entry_t *)(dirent->next_entry ? (dirent->next_entry + base_ptr) : 0);
+    return (directory_entry_t *)(dirent->next_entry ? (dirent->next_entry + (char*)base_ptr) : 0);
 }
 
 /* Functions for easier traversal of fiels */
 static inline file_entry_t *get_first_sector(directory_entry_t *dirent)
 {
-    return (file_entry_t *)(dirent->file_pointer ? (dirent->file_pointer + base_ptr) : 0);
+    return (file_entry_t *)(dirent->file_pointer ? (dirent->file_pointer + (char*)base_ptr) : 0);
 }
 
 static inline file_entry_t *get_next_sector(file_entry_t *fileent)
 {
-    return (file_entry_t *)(fileent->next_sector ? (fileent->next_sector + base_ptr) : 0);
+    return (file_entry_t *)(fileent->next_sector ? (fileent->next_sector + (char*)base_ptr) : 0);
 }
 
 /* Sector walking */
@@ -159,7 +159,7 @@ static inline directory_entry_t *pop_directory()
     }
 
     /* Just return the root pointer */
-    return (directory_entry_t *)(base_ptr + SECTOR_SIZE);
+    return (directory_entry_t *)((char*)base_ptr + SECTOR_SIZE);
 }
 
 static inline directory_entry_t *peek_directory()
@@ -169,7 +169,7 @@ static inline directory_entry_t *peek_directory()
         return (directory_entry_t *)directories[directory_top-1];
     }
 
-    return (directory_entry_t *)(base_ptr + SECTOR_SIZE);
+    return (directory_entry_t *)((char*)base_ptr + SECTOR_SIZE);
 }
 
 /* Parse out the next token in a path delimited by '\' */

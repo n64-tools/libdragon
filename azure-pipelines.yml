@@ -1,0 +1,185 @@
+jobs:
+- job: Windows
+  pool:
+    vmImage: 'vs2017-win2016'
+  steps:
+
+  - script: |
+      curl -L https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-win64-8.2.0-20181107.6.zip --output gcc-toolchain-mips64-win64.zip
+      curl -L https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h
+      curl -L https://windows.php.net/downloads/php-sdk/deps-7.1-vc14-x64.7z --output php-sdk.7z
+    displayName: 'Get dependencies'
+    continueOnError: false
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: 'gcc-toolchain-mips64-win64.zip' 
+      destinationFolder: gcc-toolchain-mips64
+      cleanDestinationFolder: false 
+    displayName: 'Extract gcc-toolchain-mips64-win64'
+    continueOnError: false
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: 'php-sdk.7z' 
+      destinationFolder: php-sdk
+      cleanDestinationFolder: false 
+    displayName: 'Extract php-sdk'
+    continueOnError: false
+
+  - bash: |
+      #sed -i -- "s|ROOTDIR = $(N64_INST)|ROOTDIR = $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64|g" $BUILD_SOURCESDIRECTORY/Makefile
+      sed -i -- 's|rm -f \*\.o \*\.a|DEL /F \*\.o \*\.a|g' $BUILD_SOURCESDIRECTORY/Makefile
+      sed -i -- 's|rm -rf $(CURDIR)/build|RD /S /Q $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/Makefile
+      sed -i -- 's|$(N64PREFIX)gcc|$(N64PREFIX)gcc.exe|g' $BUILD_SOURCESDIRECTORY/Makefile
+      sed -i -- 's|$(N64PREFIX)as|$(N64PREFIX)as.exe|g' $BUILD_SOURCESDIRECTORY/Makefile
+      sed -i -- 's|$(N64PREFIX)ld|$(N64PREFIX)ld.exe|g' $BUILD_SOURCESDIRECTORY/Makefile
+      sed -i -- 's|$(N64PREFIX)ar|$(N64PREFIX)ar.exe|g' $BUILD_SOURCESDIRECTORY/Makefile
+
+      sed -i -- 's|if not exist $(CURDIR)/build mkdir $(CURDIR)/build|mkdir -p $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/files.in
+      sed -i -- 's|OFILES_LD += |OFILES_LD = $(OFILES_LD) |g' $BUILD_SOURCESDIRECTORY/files.in
+      sed -i -- 's|OFILES_LDP += |OFILES_LDP = $(OFILES_LDP) |g' $BUILD_SOURCESDIRECTORY/files.in
+
+      cat $BUILD_SOURCESDIRECTORY/Makefile
+      echo .
+      echo .
+      echo .
+      cat $BUILD_SOURCESDIRECTORY/files.in
+    displayName: 'Adjust Make Files for Windows'
+    continueOnError: false
+
+  - script: |
+      call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+
+      cl .\tools\chksum64.c
+      cl .\tools\n64tool.c
+      cl .\tools\dumpdfs\dumpdfs.c -I .\include\
+      cl .\tools\mkdfs\mkdfs.c -I .\include\
+      cl .\tools\mksprite\convtool.c
+      cl /MT .\tools\mksprite\mksprite.c .\php-sdk\deps\lib\libpng.lib /I .\php-sdk\deps\include\libpng16\ /link 
+     
+      setx N64_INST "%BUILD_SOURCESDIRECTORY%/gcc-toolchain-mips64"
+      ::nmake -f Makefile libdragon
+    displayName: 'Build SDK'
+    continueOnError: false
+
+  - bash: |
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/tools/
+      cp "$BUILD_SOURCESDIRECTORY/"*.exe "$BUILD_ARTIFACTSTAGINGDIRECTORY/tools/"
+      cp "$BUILD_SOURCESDIRECTORY/php-sdk/deps/bin/libpng.dll" "$BUILD_ARTIFACTSTAGINGDIRECTORY/tools/"
+
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/include/
+      cp "$BUILD_SOURCESDIRECTORY/include/"* "$BUILD_ARTIFACTSTAGINGDIRECTORY/include/"
+
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/lib/
+      cp "$BUILD_SOURCESDIRECTORY/"*.a "$BUILD_ARTIFACTSTAGINGDIRECTORY/lib/"
+      cp "$BUILD_SOURCESDIRECTORY/"*.x "$BUILD_ARTIFACTSTAGINGDIRECTORY/lib/"
+      cp "$BUILD_SOURCESDIRECTORY/header" "$BUILD_ARTIFACTSTAGINGDIRECTORY/lib/"
+    displayName: 'Move Artifacts to Staging Directory'
+    continueOnError: false
+
+  # Publish build artifacts to Azure Artifacts/TFS or a file share
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Build Artifacts
+    inputs:
+      pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'binaries' 
+      publishLocation: 'Container' # Options: container, filePath
+      #targetPath: # Required when publishLocation == FilePath
+      parallel: true # Optional
+      #parallelCount: # Optional
+
+  - task: UniversalPackages@0
+    displayName: Universal Publish Windows Package
+    inputs:
+      command: publish
+      publishDirectory: '$(Build.ArtifactStagingDirectory)/win64/'
+      vstsFeedPublish: 'Releases'
+      vstsFeedPackagePublish: 'libdragon-win64'
+      packagePublishDescription: 'Libdragon SDK for the N64 compatible with Windows'
+      #versionOption: custom
+      #versionPublish: <Package version>
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+
+  - bash: |
+      curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/win64/libdragon-win64.zip -u$USER:$KEY https://api.bintray.com/content/n64-tools/libdragon/binaries/$BUILD_BUILDNUMBER/libdragon-win64-$BUILD_BUILDNUMBER.zip;publish=1;
+    env:
+      USER: $(BinTrayUser)
+      KEY: $(BinTrayKey)
+    displayName: 'Upload to Bintray'
+    continueOnError: false
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+  
+- job: Linux
+  pool:
+    vmImage: 'ubuntu-16.04'
+  steps:
+
+  - bash: |   
+      sudo add-apt-repository ppa:jonathonf/gcc -y
+      sudo apt-get -qq update
+
+      sudo apt-get install -y build-essential software-properties-common
+      sudo apt-get install -y gcc-8 
+    displayName: 'Setup Environment'
+    continueOnError: false
+  
+  - bash: |
+      curl -L https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-linux64-8.2.0-20181107.6.tar.gz --output gcc-toolchain-mips64-linux64.tar.gz
+      mkdir -p $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64
+      sudo tar -C $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64 -xhzvf gcc-toolchain-mips64-linux64.tar.gz
+    displayName: 'Get gcc-toolchain-mips64'
+    continueOnError: false
+    
+
+  - bash: |      
+      export N64_INST="$BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64"
+      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$N64_INST/x86_64-pc-linux-gnu/mips64-elf/lib
+      sudo ldconfig
+
+      make tools
+      make tools-install
+
+      make
+      make install
+    displayName: 'Build SDK'
+    continueOnError: false
+  
+  - bash: |
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/gcc-toolchain-mips64/
+      cp -a $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64/. $BUILD_ARTIFACTSTAGINGDIRECTORY/gcc-toolchain-mips64/
+    displayName: 'Move Artifacts to Staging Directory'
+    continueOnError: false
+
+  # Publish build artifacts to Azure Artifacts/TFS or a file share
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Build Artifacts
+    inputs:
+      pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'binaries-linux' 
+      publishLocation: 'Container' # Options: container, filePath
+      #targetPath: # Required when publishLocation == FilePath
+      parallel: true # Optional
+      #parallelCount: # Optional
+
+  #TODO: should only publish to feed when on master branch!!!
+  - task: UniversalPackages@0
+    displayName: Universal Publish Linux Package
+    inputs:
+      command: publish
+      publishDirectory: '$(Build.ArtifactStagingDirectory)/linux64/'
+      vstsFeedPublish: 'Releases'
+      vstsFeedPackagePublish: 'libdragon-linux64'
+      packagePublishDescription: 'Libdragon SDK for the N64 compatible with Linux'
+      #versionOption: custom
+      #versionPublish: <Package version>
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+  - bash: |
+      curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/linux64/libdragon-linux64.tar.gz -u$USER:$KEY https://api.bintray.com/content/n64-tools/libgragon/binaries/$BUILD_BUILDNUMBER/libdragon-linux64-$BUILD_BUILDNUMBER.tar.gz;publish=1;
+    env:
+      USER: $(BinTrayUser)
+      KEY: $(BinTrayKey)
+    displayName: 'Upload to Bintray'
+    continueOnError: false
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))

@@ -1,14 +1,26 @@
 #include <stdio.h>
+<<<<<<< a48d1e447aa590caa7c9be94fbe1be385b17f237
 #include <stdlib.h>
 #include <dirent.h>
+=======
+#include <malloc.h>
+>>>>>>> CICD and Windows compatibility (#1)
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
 #include <stdint.h>
+
 #include <sys/types.h>
+#ifndef _MSC_VER
+#include <dirent.h>
 #include <sys/param.h>
+#else
+#include "dirent.h"
+#endif // !_MSC_VER
+
 #include "dragonfs.h"
 #include "dfsinternal.h"
+
 
 #if BYTE_ORDER == BIG_ENDIAN
 #define SWAPLONG(i) (i)

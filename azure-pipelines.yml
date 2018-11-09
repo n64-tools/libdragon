@@ -28,26 +28,11 @@ jobs:
     continueOnError: false
 
   - bash: |
-      #sed -i -- "s|ROOTDIR = $(N64_INST)|ROOTDIR = $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64|g" $BUILD_SOURCESDIRECTORY/Makefile
       sed -i -- 's|rm -f \*\.o \*\.a|DEL /F \*\.o \*\.a|g' $BUILD_SOURCESDIRECTORY/Makefile
-      sed -i -- 's|rm -rf $(CURDIR)/build|RD /S /Q $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/Makefile
-      sed -i -- 's|$(N64PREFIX)gcc|$(N64PREFIX)gcc.exe|g' $BUILD_SOURCESDIRECTORY/Makefile
-      sed -i -- 's|$(N64PREFIX)as|$(N64PREFIX)as.exe|g' $BUILD_SOURCESDIRECTORY/Makefile
-      sed -i -- 's|$(N64PREFIX)ld|$(N64PREFIX)ld.exe|g' $BUILD_SOURCESDIRECTORY/Makefile
-      sed -i -- 's|$(N64PREFIX)ar|$(N64PREFIX)ar.exe|g' $BUILD_SOURCESDIRECTORY/Makefile
-
-      sed -i -- 's|if not exist $(CURDIR)/build mkdir $(CURDIR)/build|mkdir -p $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/files.in
-      sed -i -- 's|OFILES_LD += |OFILES_LD = $(OFILES_LD) |g' $BUILD_SOURCESDIRECTORY/files.in
-      sed -i -- 's|OFILES_LDP += |OFILES_LDP = $(OFILES_LDP) |g' $BUILD_SOURCESDIRECTORY/files.in
-
-      cat $BUILD_SOURCESDIRECTORY/Makefile
-      echo .
-      echo .
-      echo .
-      cat $BUILD_SOURCESDIRECTORY/files.in
+      sed -i -- 's|rm -rf $(CURDIR)/build|RD /S /Q $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/Makefile 
     displayName: 'Adjust Make Files for Windows'
     continueOnError: false
-
+    
   - script: |
       call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
 
@@ -58,8 +43,9 @@ jobs:
       cl .\tools\mksprite\convtool.c
       cl /MT .\tools\mksprite\mksprite.c .\php-sdk\deps\lib\libpng.lib /I .\php-sdk\deps\include\libpng16\ /link 
      
-      setx N64_INST "%BUILD_SOURCESDIRECTORY%/gcc-toolchain-mips64"
-      ::nmake -f Makefile libdragon
+      set N64_INST="%BUILD_SOURCESDIRECTORY%\gcc-toolchain-mips64"
+      set PATH=%PATH%;%BUILD_SOURCESDIRECTORY%\gcc-toolchain-mips64\bin
+      make libdragon
     displayName: 'Build SDK'
     continueOnError: false
 
@@ -102,6 +88,8 @@ jobs:
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
 
   - bash: |
+      cd $BUILD_ARTIFACTSTAGINGDIRECTORY
+      zip -rq libdragon-win64.zip *
       curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/win64/libdragon-win64.zip -u$USER:$KEY https://api.bintray.com/content/n64-tools/libdragon/binaries/$BUILD_BUILDNUMBER/libdragon-win64-$BUILD_BUILDNUMBER.zip;publish=1;
     env:
       USER: $(BinTrayUser)
@@ -176,6 +164,8 @@ jobs:
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
 
   - bash: |
+      cd $BUILD_ARTIFACTSTAGINGDIRECTORY
+      tar -czf libdragon-linux64.tar.gz *
       curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/libdragon-linux64.tar.gz -u$USER:$KEY https://api.bintray.com/content/n64-tools/libgragon/binaries/$BUILD_BUILDNUMBER/libdragon-linux64-$BUILD_BUILDNUMBER.tar.gz;publish=1;
     env:
       USER: $(BinTrayUser)

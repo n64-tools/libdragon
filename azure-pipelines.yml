@@ -86,10 +86,19 @@ jobs:
       #versionOption: custom
       #versionPublish: <Package version>
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+  
+  # Archive Files
+  # Archive files using compression formats such as .7z, .rar, .tar.gz, and .zip.
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)' 
+      includeRootFolder: false
+      archiveType: 'zip' # Options: zip, 7z, tar, wim
+      #tarCompression: 'gz' # Optional. Options: gz, bz2, xz, none
+      archiveFile: '$(Build.ArtifactStagingDirectory)/libdragon-win64.zip' 
+      #replaceExistingArchive: true
 
   - bash: |
-      cd $BUILD_ARTIFACTSTAGINGDIRECTORY
-      zip -rq libdragon-win64.zip *
       curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/win64/libdragon-win64.zip -u$USER:$KEY https://api.bintray.com/content/n64-tools/libdragon/binaries/$BUILD_BUILDNUMBER/libdragon-win64-$BUILD_BUILDNUMBER.zip;publish=1;
     env:
       USER: $(BinTrayUser)

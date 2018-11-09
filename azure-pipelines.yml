@@ -96,7 +96,7 @@ jobs:
       KEY: $(BinTrayKey)
     displayName: 'Upload to Bintray'
     continueOnError: false
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
   
 - job: Linux
   pool:
@@ -172,4 +172,4 @@ jobs:
       KEY: $(BinTrayKey)
     displayName: 'Upload to Bintray'
     continueOnError: false
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))

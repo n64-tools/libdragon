@@ -23,9 +23,16 @@ enum
 /* Internal filesystem stuff */
 static void *base_ptr = 0;
 static open_file_t open_files[MAX_OPEN_FILES];
-static uint32_t directories[MAX_DIRECTORY_DEPTH];
+static uintptr_t directories[MAX_DIRECTORY_DEPTH];
 static uint32_t directory_top = 0;
 static directory_entry_t *next_entry = 0;
+
+#ifndef _MSC_VER
+int ret __attribute__ ((unused));
+#else
+int ret;
+#endif
+
 
 /* Handling DMA from ROM to RAM */
 static inline void grab_sector(void *cart_loc, void *ram_loc)
@@ -142,7 +149,7 @@ static inline void push_directory(directory_entry_t *dirent)
     if(directory_top < MAX_DIRECTORY_DEPTH)
     {
         /* Order of execution for assignment undefined in C, lets force it */
-        directories[directory_top] = (uint32_t)dirent;
+        directories[directory_top] = (uintptr_t)dirent;
 
         directory_top++;
     }
@@ -812,7 +819,7 @@ int main( int argc, char *argv[] )
             fseek( fp, 0, SEEK_SET );
             
             void *filesystem = malloc( lSize );
-            fread( filesystem, 1, lSize, fp );
+            ret = fread( filesystem, 1, lSize, fp );
             fclose( fp );
 
             dfs_init_pc( filesystem, 1 );
@@ -833,7 +840,7 @@ int main( int argc, char *argv[] )
             fseek( fp, 0, SEEK_SET );
             
             void *filesystem = malloc( lSize );
-            fread( filesystem, 1, lSize, fp );
+            ret = fread( filesystem, 1, lSize, fp );
             fclose( fp );
 
             dfs_init_pc( filesystem, 1 );
@@ -861,7 +868,7 @@ int main( int argc, char *argv[] )
             fseek( fp, 0, SEEK_SET );
             
             void *filesystem = malloc( lSize );
-            fread( filesystem, 1, lSize, fp );
+            ret = fread( filesystem, 1, lSize, fp );
             fclose( fp );
 
             dfs_init_pc( filesystem, 1 );

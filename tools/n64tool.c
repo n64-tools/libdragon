@@ -351,7 +351,7 @@ int main(int argc, char *argv[])
 						
 						if(output_zeros(write_file, num_zeros))
 						{
-							fprintf(stderr, "Invalid offset to seek to!\n", output);
+							fprintf(stderr, "Invalid offset to seek to!\n");
 							return -1;
 						}
 						
@@ -438,7 +438,7 @@ int main(int argc, char *argv[])
 		
 		if(output_zeros(write_file, num_zeros))
 		{
-			fprintf(stderr, "Couldn't pad image!\n", output);
+			fprintf(stderr, "Couldn't pad image!\n");
 			return -1;
 		}
 		

@@ -99,7 +99,7 @@ jobs:
       #replaceExistingArchive: true
 
   - bash: |
-      curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/win64/libdragon-win64.zip -u$USER:$KEY https://api.bintray.com/content/n64-tools/libdragon/binaries/$BUILD_BUILDNUMBER/libdragon-win64-$BUILD_BUILDNUMBER.zip;publish=1;
+      curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/libdragon-win64.zip -u$USER:$KEY https://api.bintray.com/content/n64-tools/libdragon/binaries/$BUILD_BUILDNUMBER/libdragon-win64-$BUILD_BUILDNUMBER.zip;publish=1;
     env:
       USER: $(BinTrayUser)
       KEY: $(BinTrayKey)

@@ -142,7 +142,7 @@ static inline void push_directory(directory_entry_t *dirent)
     if(directory_top < MAX_DIRECTORY_DEPTH)
     {
         /* Order of execution for assignment undefined in C, lets force it */
-        directories[directory_top] = (uint32_t)dirent;
+        directories[directory_top] = (uintptr_t)dirent;
 
         directory_top++;
     }

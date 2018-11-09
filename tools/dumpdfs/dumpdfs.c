@@ -23,7 +23,7 @@ enum
 /* Internal filesystem stuff */
 static void *base_ptr = 0;
 static open_file_t open_files[MAX_OPEN_FILES];
-static uint32_t directories[MAX_DIRECTORY_DEPTH];
+static uintptr_t directories[MAX_DIRECTORY_DEPTH];
 static uint32_t directory_top = 0;
 static directory_entry_t *next_entry = 0;
 

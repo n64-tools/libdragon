@@ -36,9 +36,9 @@ jobs:
       sed -i -- 's|$(N64PREFIX)ld|$(N64PREFIX)ld.exe|g' $BUILD_SOURCESDIRECTORY/Makefile
       sed -i -- 's|$(N64PREFIX)ar|$(N64PREFIX)ar.exe|g' $BUILD_SOURCESDIRECTORY/Makefile
 
-      sed -i -- 's|if not exist $(CURDIR)/build mkdir $(CURDIR)/build|mkdir -p $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/files.in
-      sed -i -- 's|OFILES_LD += |OFILES_LD = $(OFILES_LD) |g' $BUILD_SOURCESDIRECTORY/files.in
-      sed -i -- 's|OFILES_LDP += |OFILES_LDP = $(OFILES_LDP) |g' $BUILD_SOURCESDIRECTORY/files.in
+      #sed -i -- 's|if not exist $(CURDIR)/build mkdir $(CURDIR)/build|mkdir -p $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/files.in
+      #sed -i -- 's|OFILES_LD += |OFILES_LD = $(OFILES_LD) |g' $BUILD_SOURCESDIRECTORY/files.in
+      #sed -i -- 's|OFILES_LDP += |OFILES_LDP = $(OFILES_LDP) |g' $BUILD_SOURCESDIRECTORY/files.in
 
       cat $BUILD_SOURCESDIRECTORY/Makefile
       echo .
@@ -50,7 +50,7 @@ jobs:
     
   - powershell: |
       Write-Host '##vso[task.setvariable variable=n64.inst]$env:BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64'
-    displayName: 'Build SDK'
+    displayName: 'Set environment variables'
     continueOnError: false
 
   - script: |
@@ -63,8 +63,9 @@ jobs:
       cl .\tools\mksprite\convtool.c
       cl /MT .\tools\mksprite\mksprite.c .\php-sdk\deps\lib\libpng.lib /I .\php-sdk\deps\include\libpng16\ /link 
      
-      ::set N64_INST="%BUILD_SOURCESDIRECTORY%/gcc-toolchain-mips64"
-      nmake -f Makefile libdragon
+      set N64_INST="%BUILD_SOURCESDIRECTORY%\gcc-toolchain-mips64"
+      set PATH=%PATH%;%BUILD_SOURCESDIRECTORY%\gcc-toolchain-mips64\bin
+      make libdragon
     displayName: 'Build SDK'
     continueOnError: false
 

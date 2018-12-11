@@ -7,7 +7,7 @@ jobs:
   - script: |
       curl -L https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-win64-8.2.0-20181107.6.zip --output gcc-toolchain-mips64-win64.zip
       curl -L https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h
-      curl -L https://windows.php.net/downloads/php-sdk/deps-7.1-vc14-x64.7z --output php-sdk.7z
+      curl -L https://windows.php.net/downloads/php-sdk/deps-7.0-vc14-x64.7z --output php-sdk.7z
     displayName: 'Get dependencies'
     continueOnError: false
 

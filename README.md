@@ -16,10 +16,14 @@ The Conker64 version of Libdragon includes extended RDP features:
 - Bug fixes on 32bit mode / textures
 - Some other fixes
 
+This version also includes:
+- automated build pipeline
+- 240p support
+
 Conker64 Source:
 https://github.com/Conker64/libdragon | develop-conker64
 
 Original source:
-https://github.com/DragonMinded/libdragon
+https://github.com/DragonMinded/libdragon | develop-dragonminded
 
-Somes changes applied from Chillywilly's libdragon (2014-11-12) | develop-dragonminded
+Somes changes applied from Chillywilly's libdragon (2014-11-12) 

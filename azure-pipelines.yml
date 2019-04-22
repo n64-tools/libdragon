@@ -5,9 +5,9 @@ jobs:
   steps:
 
   - script: |
-      curl -L https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-win64-8.2.0-20181107.6.zip --output gcc-toolchain-mips64-win64.zip
+      curl -L https://n64tools.blob.core.windows.net/binaries/N64-tools/mips64-gcc-toolchain/master/latest/gcc-toolchain-mips64-win64.zip --output gcc-toolchain-mips64-win64.zip
       curl -L https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h
-      curl -L https://windows.php.net/downloads/php-sdk/deps-7.0-vc14-x64.7z --output php-sdk.7z
+      curl -L https://windows.php.net/downloads/php-sdk/deps/vc15/x64/libpng-1.6.34-2-vc15-x64.zip --output libpng.zip
     displayName: 'Get dependencies'
     continueOnError: false
 
@@ -21,10 +21,10 @@ jobs:
 
   - task: ExtractFiles@1
     inputs:
-      archiveFilePatterns: 'php-sdk.7z' 
-      destinationFolder: php-sdk
+      archiveFilePatterns: 'libpng.zip' 
+      destinationFolder: libpng
       cleanDestinationFolder: false 
-    displayName: 'Extract php-sdk'
+    displayName: 'Extract libpng'
     continueOnError: false
 
   - bash: |
@@ -41,7 +41,7 @@ jobs:
       cl .\tools\dumpdfs\dumpdfs.c -I .\include\
       cl .\tools\mkdfs\mkdfs.c -I .\include\
       cl .\tools\mksprite\convtool.c
-      cl /MT .\tools\mksprite\mksprite.c .\php-sdk\deps\lib\libpng.lib /I .\php-sdk\deps\include\libpng16\ /link 
+      cl /MT .\tools\mksprite\mksprite.c .\libpng\lib\libpng.lib /I .\libpng\include\libpng16\ /link 
      
       set N64_INST="%BUILD_SOURCESDIRECTORY%\gcc-toolchain-mips64"
       set PATH=%PATH%;%BUILD_SOURCESDIRECTORY%\gcc-toolchain-mips64\bin
@@ -52,7 +52,7 @@ jobs:
   - bash: |
       mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/tools/
       cp "$BUILD_SOURCESDIRECTORY/"*.exe "$BUILD_ARTIFACTSTAGINGDIRECTORY/tools/"
-      cp "$BUILD_SOURCESDIRECTORY/php-sdk/deps/bin/libpng.dll" "$BUILD_ARTIFACTSTAGINGDIRECTORY/tools/"
+      cp "$BUILD_SOURCESDIRECTORY/libpng/bin/libpng.dll" "$BUILD_ARTIFACTSTAGINGDIRECTORY/tools/"
 
       mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/include/
       cp "$BUILD_SOURCESDIRECTORY/include/"* "$BUILD_ARTIFACTSTAGINGDIRECTORY/include/"
@@ -122,7 +122,7 @@ jobs:
     continueOnError: false
   
   - bash: |
-      curl -L https://dl.bintray.com/n64-tools/mips64-gcc-toolchain/gcc-toolchain-mips64-linux64-8.2.0-20181107.6.tar.gz --output gcc-toolchain-mips64-linux64.tar.gz
+      curl -L https://n64tools.blob.core.windows.net/binaries/N64-tools/mips64-gcc-toolchain/master/latest/gcc-toolchain-mips64-linux64.tar.gz --output gcc-toolchain-mips64-linux64.tar.gz
       mkdir -p $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64
       sudo tar -C $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64 -xhzvf gcc-toolchain-mips64-linux64.tar.gz
     displayName: 'Get gcc-toolchain-mips64'

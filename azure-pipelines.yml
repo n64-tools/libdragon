@@ -74,18 +74,6 @@ jobs:
       #targetPath: # Required when publishLocation == FilePath
       parallel: true # Optional
       #parallelCount: # Optional
-
-  - task: UniversalPackages@0
-    displayName: Universal Publish Windows Package
-    inputs:
-      command: publish
-      publishDirectory: '$(Build.ArtifactStagingDirectory)'
-      vstsFeedPublish: 'Releases'
-      vstsFeedPackagePublish: 'libdragon-win64'
-      packagePublishDescription: 'Libdragon SDK for the N64 compatible with Windows'
-      #versionOption: custom
-      #versionPublish: <Package version>
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
   
   # Archive Files
   # Archive files using compression formats such as .7z, .rar, .tar.gz, and .zip.
@@ -97,6 +85,18 @@ jobs:
       #tarCompression: 'gz' # Optional. Options: gz, bz2, xz, none
       archiveFile: '$(Build.ArtifactStagingDirectory)/libdragon-win64.zip' 
       #replaceExistingArchive: true
+
+  - task: AzureFileCopy@3
+    inputs:
+      sourcePath: '$(Build.ArtifactStagingDirectory)\*.zip'
+      azureSubscription: 'MsdnAzureServiceRole'
+      Destination: 'AzureBlob'
+      storage: 'n64tools'
+      ContainerName: 'binaries'
+      blobPrefix: 'N64-tools/libdragon/$(Build.SourceBranchName)/latest/'
+      outputStorageUri: 'outputStorageUri'
+    displayName: Upload program to Blob storage
+    #condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
   - bash: |
       curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/libdragon-win64.zip -u$USER:$KEY https://api.bintray.com/content/n64-tools/libdragon/binaries/$BUILD_BUILDNUMBER/libdragon-win64-$BUILD_BUILDNUMBER.zip;publish=1;
@@ -159,19 +159,6 @@ jobs:
       parallel: true # Optional
       #parallelCount: # Optional
 
-  #TODO: should only publish to feed when on master branch!!!
-  - task: UniversalPackages@0
-    displayName: Universal Publish Linux Package
-    inputs:
-      command: publish
-      publishDirectory: '$(Build.ArtifactStagingDirectory)'
-      vstsFeedPublish: 'Releases'
-      vstsFeedPackagePublish: 'libdragon-linux64'
-      packagePublishDescription: 'Libdragon SDK for the N64 compatible with Linux'
-      #versionOption: custom
-      #versionPublish: <Package version>
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
-
   - bash: |
       cd $BUILD_ARTIFACTSTAGINGDIRECTORY
       tar -czf libdragon-linux64.tar.gz *
@@ -182,3 +169,15 @@ jobs:
     displayName: 'Upload to Bintray'
     continueOnError: false
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+
+  - task: AzureFileCopy@3
+    inputs:
+      sourcePath: '$(Build.ArtifactStagingDirectory)\*.tar.gz'
+      azureSubscription: 'MsdnAzureServiceRole'
+      Destination: 'AzureBlob'
+      storage: 'n64tools'
+      ContainerName: 'binaries'
+      blobPrefix: 'N64-tools/libdragon/$(Build.SourceBranchName)/latest/'
+      outputStorageUri: 'outputStorageUri'
+    displayName: Upload program to Blob storage
+    #condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))

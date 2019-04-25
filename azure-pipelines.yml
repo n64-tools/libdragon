@@ -171,8 +171,8 @@ jobs:
     condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
 
   - task: AzureCLI@1
-  inputs:
-    connectedServiceNameARM: 'MsdnAzureServiceRole'
-    scriptLocation: 'inlineScript'
-    inlineScript: 'az storage blob upload --account-name n64tools -f $(Build.ArtifactStagingDirectory)/libdragon-linux64.tar.gz -c binaries -n N64-tools/libdragon/$(Build.SourceBranchName)/latest/libdragon-linux64.tar.gz'
-  displayName: Upload linux binary to Blob storage
+    inputs:
+      connectedServiceNameARM: 'MsdnAzureServiceRole'
+      scriptLocation: 'inlineScript'
+      inlineScript: 'az storage blob upload --account-name n64tools -f $(Build.ArtifactStagingDirectory)/libdragon-linux64.tar.gz -c binaries -n N64-tools/libdragon/$(Build.SourceBranchName)/latest/libdragon-linux64.tar.gz'
+    displayName: Upload linux binary to Blob storage

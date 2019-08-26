@@ -158,33 +158,32 @@ jobs:
       #targetPath: # Required when publishLocation == FilePath
       parallel: true # Optional
       #parallelCount: # Optional
-
-#  - task: AzureCLI@1
-#    inputs:
-#      connectedServiceNameARM: 'MsdnAzureServiceRole'
-#      scriptLocation: 'inlineScript'
-#      inlineScript: 'az storage blob upload --account-name n64tools -f $(Build.ArtifactStagingDirectory)/libdragon-linux64.tar.gz -c binaries -n N64-tools/libdragon/$(Build.SourceBranchName)/latest/libdragon-linux64.tar.gz'
-#    displayName: Upload linux binary to Blob storage
-
-  - task: AzureFileCopy@3
+      
+  # Archive Files
+  # Archive files using compression formats such as .7z, .rar, .tar.gz, and .zip.
+  - task: ArchiveFiles@2
     inputs:
-      sourcePath: '$(Build.ArtifactStagingDirectory)\*.tar.gz'
-      azureSubscription: 'MsdnAzureServiceRole'
-      Destination: 'AzureBlob'
-      storage: 'n64tools'
-      ContainerName: 'binaries'
-      blobPrefix: 'N64-tools/libdragon/$(Build.SourceBranchName)/latest/'
-      outputStorageUri: 'outputStorageUri'
-    displayName: Upload binary to Blob storage
-    #condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)' 
+      includeRootFolder: false
+      archiveType: 'tar' # Options: zip, 7z, tar, wim
+      tarCompression: 'gz' # Optional. Options: gz, bz2, xz, none
+      archiveFile: '$(Build.ArtifactStagingDirectory)/libdragon-linux64.tar.gz' 
+      #replaceExistingArchive: true
 
-  - bash: |
-      cd $BUILD_ARTIFACTSTAGINGDIRECTORY
-      tar -czf libdragon-linux64.tar.gz *
-      curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/libdragon-linux64.tar.gz -u$USER:$KEY https://api.bintray.com/content/n64-tools/libgragon/binaries/$BUILD_BUILDNUMBER/libdragon-linux64-$BUILD_BUILDNUMBER.tar.gz;publish=1;
-    env:
-      USER: $(BinTrayUser)
-      KEY: $(BinTrayKey)
-    displayName: 'Upload to Bintray'
-    continueOnError: false
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+  - task: AzureCLI@1
+    inputs:
+      connectedServiceNameARM: 'MsdnAzureServiceRole'
+      scriptLocation: 'inlineScript'
+      inlineScript: 'az storage blob upload --account-name n64tools -f $(Build.ArtifactStagingDirectory)/libdragon-linux64.tar.gz -c binaries -n N64-tools/libdragon/$(Build.SourceBranchName)/latest/libdragon-linux64.tar.gz'
+    displayName: Upload linux binary to Blob storage
+
+  #- bash: |
+  #    cd $BUILD_ARTIFACTSTAGINGDIRECTORY
+  #    tar -czf libdragon-linux64.tar.gz *
+  #    curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/libdragon-linux64.tar.gz -u$USER:$KEY https://api.bintray.com/content/n64-tools/libgragon/binaries/$BUILD_BUILDNUMBER/libdragon-linux64-$BUILD_BUILDNUMBER.tar.gz;publish=1;
+  #  env:
+  #    USER: $(BinTrayUser)
+  #    KEY: $(BinTrayKey)
+  #  displayName: 'Upload to Bintray'
+  #  continueOnError: false
+  #  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))

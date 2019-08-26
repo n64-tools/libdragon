@@ -117,7 +117,7 @@ jobs:
       sudo apt-get -qq update
 
       sudo apt-get install -y build-essential software-properties-common
-      sudo apt-get install -y gcc-8 
+      sudo apt-get install -y gcc-9 
     displayName: 'Setup Environment'
     continueOnError: false
   
@@ -159,12 +159,24 @@ jobs:
       parallel: true # Optional
       #parallelCount: # Optional
 
-  - task: AzureCLI@1
+#  - task: AzureCLI@1
+#    inputs:
+#      connectedServiceNameARM: 'MsdnAzureServiceRole'
+#      scriptLocation: 'inlineScript'
+#      inlineScript: 'az storage blob upload --account-name n64tools -f $(Build.ArtifactStagingDirectory)/libdragon-linux64.tar.gz -c binaries -n N64-tools/libdragon/$(Build.SourceBranchName)/latest/libdragon-linux64.tar.gz'
+#    displayName: Upload linux binary to Blob storage
+
+  - task: AzureFileCopy@3
     inputs:
-      connectedServiceNameARM: 'MsdnAzureServiceRole'
-      scriptLocation: 'inlineScript'
-      inlineScript: 'az storage blob upload --account-name n64tools -f $(Build.ArtifactStagingDirectory)/libdragon-linux64.tar.gz -c binaries -n N64-tools/libdragon/$(Build.SourceBranchName)/latest/libdragon-linux64.tar.gz'
-    displayName: Upload linux binary to Blob storage
+      sourcePath: '$(Build.ArtifactStagingDirectory)\*.tar.gz'
+      azureSubscription: 'MsdnAzureServiceRole'
+      Destination: 'AzureBlob'
+      storage: 'n64tools'
+      ContainerName: 'binaries'
+      blobPrefix: 'N64-tools/libdragon/$(Build.SourceBranchName)/latest/'
+      outputStorageUri: 'outputStorageUri'
+    displayName: Upload binary to Blob storage
+    #condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
 
   - bash: |
       cd $BUILD_ARTIFACTSTAGINGDIRECTORY

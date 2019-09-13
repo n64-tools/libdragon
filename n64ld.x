@@ -12,7 +12,7 @@
  * Developed by Frank Somers <frank@g0dev.com>
  * Modifications by hcs (halleyscometsoftware@hotmail.com)
  *
- * $Header: /afs/icequake.net/users/nemesis/n64/sf/asdf/n64dev/lib/alt-libn64/n64ld.x,v 1.2 2006-08-11 15:54:11 halleyscometsw Exp $
+ * $Header: /cvsroot/n64dev/n64dev/lib/alt-libn64/n64ld.x,v 1.2 2006/08/11 15:54:11 halleyscometsw Exp $
  *
  * ========================================================================
  */
@@ -22,125 +22,85 @@ OUTPUT_ARCH (mips)
 EXTERN (_start)
 ENTRY (_start)
 
-MEMORY
-{
-    mem : ORIGIN = 0x80000400, LENGTH = 4M-0x0400
-}
-
 SECTIONS {
    /* Start address of code is 1K up in uncached, unmapped RAM.  We have
     * to be at least this far up in order to not interfere with the cart
     * boot code which is copying it down from the cart
     */
-    . = 0x80000400;
 
-    /* The text section carries the app code and its relocation addr is
+   . = 0x80000400 ;
+
+   /* The text section carries the app code and its relocation addr is
     * the first byte of the cart domain in cached, unmapped memory
     */
-    .text : {
-        *(.boot)
-        . = ALIGN(16);
-        __text_start = .;
-        *(.text)
-        *(.text.*)
-        *(.init)
-        *(.fini)
-        *(.gnu.linkonce.t.*)
-        __text_end  = .;
-    } > mem
 
-   .eh_frame_hdr : { *(.eh_frame_hdr) } > mem
-   .eh_frame : { KEEP (*(.eh_frame)) } > mem
-   .gcc_except_table : { *(.gcc_except_table*) } > mem
-   .jcr : { KEEP (*(.jcr)) } > mem
+   .text : {
+      FILL (0)
 
-    .rodata : {
-        *(.rdata)
-        *(.rodata)
-        *(.rodata.*)
-        *(.gnu.linkonce.r.*)
-    } > mem
+      *(.boot)
+	  . = ALIGN(16);
+      __text_start = . ;
+      *(.text)
+      *(.text.*)
+      *(.ctors)
+      *(.dtors)
+      *(.rodata)
+      *(.rodata.*)
+	  *(.init)
+      *(.fini)
+      __text_end  = . ;
+   }
 
-    . = ALIGN(8);
 
-    .ctors : {
-        __CTOR_LIST_SIZE__ = .;
-        LONG((__CTOR_END__ - __CTOR_LIST__) / 4 - 1)
-        __CTOR_LIST__ = .;
-        *(.ctors)
-        LONG(0)
-        __CTOR_END__ = .;
-    } > mem
-
-    . = ALIGN(8);
-
-    .dtors : {
-        __DTOR_LIST__ = .;
-        LONG((__DTOR_END__ - __DTOR_LIST__) / 4 - 2)
-        *(.dtors)
-        LONG(0)
-        __DTOR_END__ = .;
-    } > mem
-
-    . = ALIGN(8);
-
-    /* Data section has relocation address at start of RAM in cached,
+   /* Data section has relocation address at start of RAM in cached,
     * unmapped memory, but is loaded just at the end of the text segment,
     * and must be copied to the correct location at startup
-    * Gather all initialised data together.  The memory layout
-    * will place the global initialised data at the lowest addrs.
-    * The lit8, lit4, sdata and sbss sections have to be placed
-    * together in that order from low to high addrs with the _gp symbol
-    * positioned (aligned) at the start of the sdata section.
-    * We then finish off with the standard bss section
     */
-    .data : {
-        __data_start = .;
-        *(.data)
-        *(.data.*)
-        *(.gnu.linkonce.d.*)
-    } > mem
 
-    /* Small data START */
+   .data : {
+      /* Gather all initialised data together.  The memory layout
+       * will place the global initialised data at the lowest addrs.
+       * The lit8, lit4, sdata and sbss sections have to be placed
+       * together in that order from low to high addrs with the _gp symbol
+       * positioned (aligned) at the start of the sdata section.
+       * We then finish off with the standard bss section
+       */
 
-    . = ALIGN(8);
-    .sdata : {
-        _gp = . + 0x8000;
-        *(.sdata)
-        *(.sdata.*)
-        *(.gnu.linkonce.s.*)
-    } > mem
+      FILL (0xaa)
 
-    .lit8 : {
-        *(.lit8)
-    } > mem
-    .lit4 : {
-        *(.lit4)
-    } > mem
+	  . = ALIGN(16);
+      __data_start = . ;
+         *(.data)
+         *(.lit8)
+         *(.lit4) ;
+     /* _gp = ALIGN(16) + 0x7ff0 ;*/
+/*	 _gp = . + 0x7ff0; */
+	 . = ALIGN(16);
+	 _gp = . ;
+         *(.sdata)
+	 . = ALIGN(4);
+      __data_end = . ;
+/*
+      __bss_start = . ;
+         *(.scommon)
+         *(.sbss)
+         *(COMMON)
+         *(.bss)
+      XXX Force 8-byte end alignment and update startup code
 
-    __data_end = .;
+      __bss_end = . ;
+*/
+   }
 
-    . = ALIGN(8);
-    .sbss (NOLOAD) : {
-         __bss_start = .;
-        *(.sbss)
-        *(.sbss.*)
-        *(.gnu.linkonce.sb.*)
-        *(.scommon)
-        *(.scommon.*)
-    } > mem
+   .bss (NOLOAD) :  {
+       	__bss_start = . ;
+       	*(.scommon)
+	*(.sbss)
+	*(COMMON)
+	*(.bss)
+	 . = ALIGN(4);
+	__bss_end = . ;
+	end = . ;
+   }
 
-    /* Small data END */
-
-    . = ALIGN(8);
-    .bss (NOLOAD) : {
-        *(.bss)
-        *(.bss*)
-        *(.gnu.linkonce.b.*)
-        *(COMMON)
-        __bss_end = .;
-    } > mem
-
-    . = ALIGN(8);
-    end = .;
 }

@@ -76,8 +76,6 @@ loadintvectorloop:
 	bnez t2,loadintvectorloop
 	nop
 
-	jal __do_global_ctors		/* call global constructors */
-	nop
 	jal main					/* call main app */
 	nop
 

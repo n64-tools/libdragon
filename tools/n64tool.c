@@ -436,7 +436,7 @@ int main(int argc, char *argv[])
 		/* Pad to correct length */
 		int num_zeros = total_size - total_bytes;
 		
-		if(output_zeros(write_file, num_zeros))
+		if(output_zeros(write_file, num_zeros) != 0)
 		{
 			fprintf(stderr, "Couldn't pad image in %s!\n", output);
 			return -1;

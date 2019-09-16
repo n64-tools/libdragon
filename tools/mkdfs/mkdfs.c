@@ -88,7 +88,7 @@ uint32_t add_file(const char * const file, uint32_t *size)
 
     printf("Adding '%s' to filesystem image.\n", file);
 
-    fp = fopen(file, "r");
+    fp = fopen(file, "rb");
 
     if(!fp)
     {
@@ -317,7 +317,7 @@ int main(int argc, char *argv[])
     }
 
     /* Write out filesystem */
-    FILE *fp = fopen(argv[1], "w");
+    FILE *fp = fopen(argv[1], "wb");
 
     if(!fp)
     {

@@ -16,9 +16,12 @@
 #include "dragonfs.h"
 #include "dfsinternal.h"
 
-
+#ifndef _MSC_VER
 #if BYTE_ORDER == BIG_ENDIAN
 #define SWAPLONG(i) (i)
+#else
+#define SWAPLONG(i) (((uint32_t)(i & 0xFF000000) >> 24) | ((uint32_t)(i & 0x00FF0000) >>  8) | ((uint32_t)(i & 0x0000FF00) <<  8) | ((uint32_t)(i & 0x000000FF) << 24))
+#endif
 #else
 #define SWAPLONG(i) (((uint32_t)(i & 0xFF000000) >> 24) | ((uint32_t)(i & 0x00FF0000) >>  8) | ((uint32_t)(i & 0x0000FF00) <<  8) | ((uint32_t)(i & 0x000000FF) << 24))
 #endif

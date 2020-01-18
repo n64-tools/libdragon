@@ -4,8 +4,8 @@ Automatic build pipeline for Libdragon
 # Download
 Architecture | Download Links
 --- | --- 
-Windows x64 | [Latest](https://n64tools.blob.core.windows.net/binaries/N64-tools/libdragon/master/latest/libdragon-win64.zip)
-Linux x64 | [Latest](https://n64tools.blob.core.windows.net/binaries/N64-tools/libdragon/master/latest/libdragon-linux64.tar.gz)
+Windows x64 | [Latest](https://n64tools.blob.core.windows.net/binaries/N64-tools/libdragon/develop/latest/libdragon-win64.zip)
+Linux x64 | [Latest](https://n64tools.blob.core.windows.net/binaries/N64-tools/libdragon/develop/latest/libdragon-linux64.tar.gz)
 
 
 # libdragon

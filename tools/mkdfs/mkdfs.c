@@ -113,7 +113,7 @@ uint32_t add_file(const char * const file, uint32_t *size)
     {
         uint8_t t_buf[SECTOR_PAYLOAD];
 
-        uint32_t num_read = fread(t_buf, 1, SECTOR_PAYLOAD, fp);
+        uint64_t num_read = fread(t_buf, 1, SECTOR_PAYLOAD, fp);
 
         if(num_read < 0)
         {
@@ -126,7 +126,7 @@ uint32_t add_file(const char * const file, uint32_t *size)
         if(num_read > 0)
         {
             file_entry_t *tmp_sector = 0;
-            uint32_t new_node = new_sector();
+            uint64_t new_node = new_sector();
 
             tmp_sector = sector_to_memory(new_node);
             tmp_sector->next_sector = 0; // Ensure that if this is the last one, we don't reference wrong

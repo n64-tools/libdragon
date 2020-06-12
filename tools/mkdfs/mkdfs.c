@@ -106,7 +106,7 @@ uint32_t add_file(const char * const file, uint32_t *size)
     {
         uint8_t t_buf[SECTOR_PAYLOAD];
 
-        int num_read = fread(t_buf, 1, SECTOR_PAYLOAD, fp);
+        uint32_t num_read = fread(t_buf, 1, SECTOR_PAYLOAD, fp);
 
         if(num_read < 0)
         {

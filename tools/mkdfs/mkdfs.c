@@ -91,7 +91,7 @@ uint32_t add_file(const char * const file, uint32_t *size)
 
     printf("Adding '%s' to filesystem image.\n", file);
 
-    fp = fopen(file, "rb");
+    fp = fopen_s(&fp, file, "rb");
 
     if(!fp)
     {

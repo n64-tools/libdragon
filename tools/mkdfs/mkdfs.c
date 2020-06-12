@@ -21,10 +21,10 @@
 #if BYTE_ORDER == BIG_ENDIAN
 #define SWAPLONG(i) (i)
 #else
-#define SWAPLONG(i) (((uint32_t)(i & 0xFF000000) >> 24) | ((uint32_t)(i & 0x00FF0000) >>  8) | ((uint32_t)(i & 0x0000FF00) <<  8) | ((uint32_t)(i & 0x000000FF) << 24))
+#define SWAPLONG(i) (((uint64_t)(i & 0xFF000000) >> 24) | ((uint64_t)(i & 0x00FF0000) >>  8) | ((uint64_t)(i & 0x0000FF00) <<  8) | ((uint64_t)(i & 0x000000FF) << 24))
 #endif
 #else
-#define SWAPLONG(i) (((uint32_t)(i & 0xFF000000) >> 24) | ((uint32_t)(i & 0x00FF0000) >>  8) | ((uint32_t)(i & 0x0000FF00) <<  8) | ((uint32_t)(i & 0x000000FF) << 24))
+#define SWAPLONG(i) (((uint64_t)(i & 0xFF000000) >> 24) | ((uint64_t)(i & 0x00FF0000) >>  8) | ((uint64_t)(i & 0x0000FF00) <<  8) | ((uint64_t)(i & 0x000000FF) << 24))
 #endif
 
 uint8_t *dfs = NULL;
@@ -84,10 +84,10 @@ void print_help(const char * const prog_name)
     fprintf(stderr, "  and <Directory> is the directory (including subdirectories) to include\n");
 }
 
-uint32_t add_file(const char * const file, uint32_t *size)
+uint64_t add_file(const char * const file, uint64_t *size)
 {
-    uint32_t first_sector = 0;
-    uint32_t cur_sector = 0;
+    uint64_t first_sector = 0;
+    uint64_t cur_sector = 0;
     FILE *fp;
     errno_t err;
 
@@ -210,7 +210,7 @@ uint64_t add_directory(const char * const path)
                 if(S_ISREG(stats.st_mode))
                 {
                     uint64_t new_entry = new_sector();
-                    uint32_t file_size = 0;
+                    uint64_t file_size = 0;
 
                     tmp_entry = sector_to_memory(new_entry);
                     tmp_entry->next_entry = 0;
@@ -219,7 +219,7 @@ uint64_t add_directory(const char * const path)
                     strncpy(tmp_entry->path, dp->d_name, MAX_FILENAME_LEN);
                     tmp_entry->path[MAX_FILENAME_LEN] = 0;
 
-                    uint32_t new_file = add_file(file, &file_size);
+                    uint64_t new_file = add_file(file, &file_size);
 
                     if(!new_file)
                     {
@@ -244,7 +244,7 @@ uint64_t add_directory(const char * const path)
                 }
                 else if(S_ISDIR(stats.st_mode))
                 {
-                    uint32_t new_entry = new_sector();
+                    uint64_t new_entry = new_sector();
 
                     tmp_entry = sector_to_memory(new_entry);
 
@@ -255,7 +255,7 @@ uint64_t add_directory(const char * const path)
                     strncpy(tmp_entry->path, dp->d_name, MAX_FILENAME_LEN);
                     tmp_entry->path[MAX_FILENAME_LEN] = 0;
 
-                    uint32_t new_directory = add_directory(file);
+                    uint64_t new_directory = add_directory(file);
 
                     if(!new_directory)
                     {

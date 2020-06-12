@@ -202,7 +202,7 @@ uint32_t add_directory(const char * const path)
 
                 if(S_ISREG(stats.st_mode))
                 {
-                    uint32_t new_entry = new_sector();
+                    uint64_t new_entry = new_sector();
                     uint32_t file_size = 0;
 
                     tmp_entry = sector_to_memory(new_entry);

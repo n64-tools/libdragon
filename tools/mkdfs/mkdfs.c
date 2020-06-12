@@ -11,6 +11,7 @@
 #include <sys/param.h>
 #else
 #include "dirent.h"
+#include <errno.h>
 #endif // !_MSC_VER
 
 #include "dragonfs.h"
@@ -326,7 +327,7 @@ int main(int argc, char *argv[])
     }
 
     /* Write out filesystem */
-    FILE *fp
+    FILE *fp;
     errno_t err;
     
     if ((err = fopen_s(&fp, argv[1], "wb")) != 0)

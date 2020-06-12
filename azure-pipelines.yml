@@ -1,7 +1,7 @@
 jobs:
 - job: Windows
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-latest'
   steps:
 
   - script: |
@@ -39,7 +39,7 @@ jobs:
       cl .\tools\chksum64.c
       cl .\tools\n64tool.c
       cl .\tools\dumpdfs\dumpdfs.c -I .\include\
-      cl .\tools\mkdfs\mkdfs.c -I .\include\
+      cl .\tools\mkdfs\mkdfs.c -I .\include\ /Wall
       cl .\tools\mksprite\convtool.c
       cl /MT .\tools\mksprite\mksprite.c .\libpng\lib\libpng.lib /I .\libpng\include\libpng16\ /link 
      

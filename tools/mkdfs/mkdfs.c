@@ -11,7 +11,6 @@
 #include <sys/param.h>
 #else
 #include "dirent.h"
-#include <errno.h>
 #endif // !_MSC_VER
 
 #include "dragonfs.h"
@@ -21,19 +20,19 @@
 #if BYTE_ORDER == BIG_ENDIAN
 #define SWAPLONG(i) (i)
 #else
-#define SWAPLONG(i) (((uint64_t)(i & 0xFF000000) >> 24) | ((uint64_t)(i & 0x00FF0000) >>  8) | ((uint64_t)(i & 0x0000FF00) <<  8) | ((uint64_t)(i & 0x000000FF) << 24))
+#define SWAPLONG(i) (((uint32_t)(i & 0xFF000000) >> 24) | ((uint32_t)(i & 0x00FF0000) >>  8) | ((uint32_t)(i & 0x0000FF00) <<  8) | ((uint32_t)(i & 0x000000FF) << 24))
 #endif
 #else
-#define SWAPLONG(i) (((uint64_t)(i & 0xFF000000) >> 24) | ((uint64_t)(i & 0x00FF0000) >>  8) | ((uint64_t)(i & 0x0000FF00) <<  8) | ((uint64_t)(i & 0x000000FF) << 24))
+#define SWAPLONG(i) (((uint32_t)(i & 0xFF000000) >> 24) | ((uint32_t)(i & 0x00FF0000) >>  8) | ((uint32_t)(i & 0x0000FF00) <<  8) | ((uint32_t)(i & 0x000000FF) << 24))
 #endif
 
 uint8_t *dfs = NULL;
 uint32_t fs_size = 0;
 
 /* Offset from start of filesystem */
-inline uint64_t sector_offset(void *sector)
+inline uint32_t sector_offset(void *sector)
 {
-    uint64_t x = (uint8_t *)sector - dfs;
+    uint32_t x = (uint8_t *)sector - dfs;
 
     return x;
 }
@@ -44,7 +43,7 @@ inline void *sector_to_memory(uint32_t offset)
 }
 
 /* Add a new sector to the filesystem, return that sector pointer */
-uint64_t new_sector( void )
+uint32_t new_sector()
 {
     void *end;
 
@@ -69,7 +68,7 @@ uint64_t new_sector( void )
     return sector_offset(end);
 }
 
-void kill_fs( void )
+void kill_fs()
 {
     if(dfs)
     {
@@ -84,27 +83,21 @@ void print_help(const char * const prog_name)
     fprintf(stderr, "  and <Directory> is the directory (including subdirectories) to include\n");
 }
 
-uint64_t add_file(const char * const file, uint64_t *size)
+uint32_t add_file(const char * const file, uint32_t *size)
 {
-    uint64_t first_sector = 0;
-    uint64_t cur_sector = 0;
+    uint32_t first_sector = 0;
+    uint32_t cur_sector = 0;
     FILE *fp;
-    errno_t err;
 
     printf("Adding '%s' to filesystem image.\n", file);
 
-    if ((err = fopen_s(&fp, file, "rb")) != 0)
+    fp = fopen(file, "rb");
+
+    if(!fp)
     {
-       // File could not be opened. filepoint was set to NULL
-       // error code is returned in err.
-       // error message can be retrieved with strerror(err);
-       char buf[strerrorlen_s(err) + 1];
-       strerror_s(buf, sizeof buf, err);
-       fprintf_s(stderr, "cannot open file '%s': %s\n",
-                  file, buf);
+        fprintf(stderr, "Cannot open file '%s' for read!\n", file);
         return 0;
     }
-
 
     /* Start off fresh */
     *size = 0;
@@ -113,7 +106,7 @@ uint64_t add_file(const char * const file, uint64_t *size)
     {
         uint8_t t_buf[SECTOR_PAYLOAD];
 
-        uint64_t num_read = fread(t_buf, 1, SECTOR_PAYLOAD, fp);
+        int num_read = fread(t_buf, 1, SECTOR_PAYLOAD, fp);
 
         if(num_read < 0)
         {
@@ -126,7 +119,7 @@ uint64_t add_file(const char * const file, uint64_t *size)
         if(num_read > 0)
         {
             file_entry_t *tmp_sector = 0;
-            uint64_t new_node = new_sector();
+            uint32_t new_node = new_sector();
 
             tmp_sector = sector_to_memory(new_node);
             tmp_sector->next_sector = 0; // Ensure that if this is the last one, we don't reference wrong
@@ -159,11 +152,11 @@ uint64_t add_file(const char * const file, uint64_t *size)
     return first_sector;
 }
 
-uint64_t add_directory(const char * const path)
+uint32_t add_directory(const char * const path)
 {
     directory_entry_t *tmp_entry;
-    uint64_t first_entry = 0;
-    uint64_t cur_entry = 0;
+    uint32_t first_entry = 0;
+    uint32_t cur_entry = 0;
     DIR *dirp;
     struct dirent *dp;
 
@@ -209,8 +202,8 @@ uint64_t add_directory(const char * const path)
 
                 if(S_ISREG(stats.st_mode))
                 {
-                    uint64_t new_entry = new_sector();
-                    uint64_t file_size = 0;
+                    uint32_t new_entry = new_sector();
+                    uint32_t file_size = 0;
 
                     tmp_entry = sector_to_memory(new_entry);
                     tmp_entry->next_entry = 0;
@@ -219,7 +212,7 @@ uint64_t add_directory(const char * const path)
                     strncpy(tmp_entry->path, dp->d_name, MAX_FILENAME_LEN);
                     tmp_entry->path[MAX_FILENAME_LEN] = 0;
 
-                    uint64_t new_file = add_file(file, &file_size);
+                    uint32_t new_file = add_file(file, &file_size);
 
                     if(!new_file)
                     {
@@ -244,7 +237,7 @@ uint64_t add_directory(const char * const path)
                 }
                 else if(S_ISDIR(stats.st_mode))
                 {
-                    uint64_t new_entry = new_sector();
+                    uint32_t new_entry = new_sector();
 
                     tmp_entry = sector_to_memory(new_entry);
 
@@ -255,7 +248,7 @@ uint64_t add_directory(const char * const path)
                     strncpy(tmp_entry->path, dp->d_name, MAX_FILENAME_LEN);
                     tmp_entry->path[MAX_FILENAME_LEN] = 0;
 
-                    uint64_t new_directory = add_directory(file);
+                    uint32_t new_directory = add_directory(file);
 
                     if(!new_directory)
                     {
@@ -327,18 +320,13 @@ int main(int argc, char *argv[])
     }
 
     /* Write out filesystem */
-    FILE *fp;
-    errno_t err;
-    
-    if ((err = fopen_s(&fp, argv[1], "wb")) != 0)
+    FILE *fp = fopen(argv[1], "wb");
+
+    if(!fp)
     {
-       // File could not be opened. filepoint was set to NULL
-       // error code is returned in err.
-       // error message can be retrieved with strerror(err);
-       char buf[strerrorlen_s(err) + 1];
-       strerror_s(buf, sizeof buf, err);
-       fprintf_s(stderr, "cannot open file '%s': %s\n",
-                  argv[1], buf);
+        /* Error writing file out */
+        fprintf(stderr, "Error opening '%s' for writing.\n", argv[1]);
+
         kill_fs();
     }
 

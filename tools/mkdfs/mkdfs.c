@@ -159,11 +159,11 @@ uint32_t add_file(const char * const file, uint32_t *size)
     return first_sector;
 }
 
-uint32_t add_directory(const char * const path)
+uint64_t add_directory(const char * const path)
 {
     directory_entry_t *tmp_entry;
-    uint32_t first_entry = 0;
-    uint32_t cur_entry = 0;
+    uint64_t first_entry = 0;
+    uint64_t cur_entry = 0;
     DIR *dirp;
     struct dirent *dp;
 

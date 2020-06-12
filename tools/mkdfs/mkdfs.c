@@ -101,7 +101,7 @@ uint32_t add_file(const char * const file, uint32_t *size)
        char buf[strerrorlen_s(err) + 1];
        strerror_s(buf, sizeof buf, err);
        fprintf_s(stderr, "cannot open file '%s': %s\n",
-                  fileName, buf);
+                  file, buf);
         return 0;
     }
 
@@ -338,7 +338,7 @@ int main(int argc, char *argv[])
        char buf[strerrorlen_s(err) + 1];
        strerror_s(buf, sizeof buf, err);
        fprintf_s(stderr, "cannot open file '%s': %s\n",
-                  fileName, buf);
+                  argv[1], buf);
         kill_fs();
     }
 

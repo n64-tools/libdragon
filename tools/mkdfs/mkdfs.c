@@ -88,16 +88,22 @@ uint32_t add_file(const char * const file, uint32_t *size)
     uint32_t first_sector = 0;
     uint32_t cur_sector = 0;
     FILE *fp;
+    errno_t err;
 
     printf("Adding '%s' to filesystem image.\n", file);
 
-    fp = fopen_s(&fp, file, "rb");
-
-    if(!fp)
+    if ((err = fopen_s(&fp, file, "rb")) != 0)
     {
-        fprintf(stderr, "Cannot open file '%s' for read!\n", file);
+       // File could not be opened. filepoint was set to NULL
+       // error code is returned in err.
+       // error message can be retrieved with strerror(err);
+       char buf[strerrorlen_s(err) + 1];
+       strerror_s(buf, sizeof buf, err);
+       fprintf_s(stderr, "cannot open file '%s': %s\n",
+                  fileName, buf);
         return 0;
     }
+
 
     /* Start off fresh */
     *size = 0;
@@ -320,13 +326,18 @@ int main(int argc, char *argv[])
     }
 
     /* Write out filesystem */
-    FILE *fp = fopen(argv[1], "wb");
-
-    if(!fp)
+    FILE *fp
+    errno_t err;
+    
+    if ((err = fopen_s(&fp, argv[1], "wb")) != 0)
     {
-        /* Error writing file out */
-        fprintf(stderr, "Error opening '%s' for writing.\n", argv[1]);
-
+       // File could not be opened. filepoint was set to NULL
+       // error code is returned in err.
+       // error message can be retrieved with strerror(err);
+       char buf[strerrorlen_s(err) + 1];
+       strerror_s(buf, sizeof buf, err);
+       fprintf_s(stderr, "cannot open file '%s': %s\n",
+                  fileName, buf);
         kill_fs();
     }
 

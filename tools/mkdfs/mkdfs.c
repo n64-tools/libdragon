@@ -30,9 +30,9 @@ uint8_t *dfs = NULL;
 uint32_t fs_size = 0;
 
 /* Offset from start of filesystem */
-inline uint32_t sector_offset(void *sector)
+inline uint64_t sector_offset(void *sector)
 {
-    uint32_t x = (uint8_t *)sector - dfs;
+    uint64_t x = (uint8_t *)sector - dfs;
 
     return x;
 }
@@ -43,7 +43,7 @@ inline void *sector_to_memory(uint32_t offset)
 }
 
 /* Add a new sector to the filesystem, return that sector pointer */
-uint32_t new_sector()
+uint32_t new_sector( void )
 {
     void *end;
 
@@ -68,7 +68,7 @@ uint32_t new_sector()
     return sector_offset(end);
 }
 
-void kill_fs()
+void kill_fs( void )
 {
     if(dfs)
     {

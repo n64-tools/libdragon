@@ -43,7 +43,7 @@ inline void *sector_to_memory(uint32_t offset)
 }
 
 /* Add a new sector to the filesystem, return that sector pointer */
-uint32_t new_sector( void )
+uint64_t new_sector( void )
 {
     void *end;
 

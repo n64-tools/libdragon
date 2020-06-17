@@ -1,7 +1,7 @@
 Usage
 =====
 
-### Requirements
+### Requirements Linux
  - POSIX Bourne shell
  - Wget
  - bzip2

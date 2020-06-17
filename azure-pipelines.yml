@@ -1,3 +1,10 @@
+
+trigger:
+  branches:
+    include: ["master", "develop*", "release-*", "refs/tags/*" ]
+  paths:
+    exclude: [ "doc", "*.md", ".gitignore", "README.md" ]
+
 jobs:
 - job: Windows
   pool:

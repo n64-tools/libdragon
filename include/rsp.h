@@ -49,14 +49,6 @@ typedef struct {
 extern "C" {
 #endif
 
-<<<<<<< 17f0526fd5e4ba2e8ee809e1b6e4081db9d823f3
-void rsp_init();
-void load_ucode(void * start, unsigned long size);
-void read_ucode(void* start, unsigned long size);
-void load_data(void * start, unsigned long size);
-void read_data(void* start, unsigned long size);
-void run_ucode();
-=======
 /**
  * @brief Low Level Functions
  */
@@ -84,7 +76,6 @@ void rsp_wait_job( job_t *job );
 void rsp_abort_job( job_t *job );
 job_t *rsp_new_job( uint32_t fn, void (*cb)(job_t *), uint32_t count, ... );
 void rsp_dispose_job( job_t *job );
->>>>>>> Added RSP files
 
 #ifdef __cplusplus
 }

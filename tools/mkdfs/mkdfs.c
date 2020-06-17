@@ -1,10 +1,6 @@
 #include <stdio.h>
-<<<<<<< a48d1e447aa590caa7c9be94fbe1be385b17f237
 #include <stdlib.h>
 #include <dirent.h>
-=======
-#include <malloc.h>
->>>>>>> CICD and Windows compatibility (#1)
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>

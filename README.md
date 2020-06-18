@@ -54,3 +54,7 @@ becomes;
 Basically all operands are required and separated by commas.
 
 While using these custom instructions, you should use `$v00`-`$v31` when naming vector registers and `$0`-`$31` when naming scalar registers.
+
+## Windows specific instructions for those that want to build locally!
+Due to the fact that windows does not include some header files needed for the tools, it is necessary to download them separately.
+Please look at the azure-pipelines.yml file, to see how the lib and tools are built in a windows environment.

@@ -17,12 +17,12 @@ OFILES_LD += $(CURDIR)/build/timer.o
 OFILES_LD += $(CURDIR)/build/tpak.o
 OFILES_LD += $(CURDIR)/build/version.o
 
-OFILES_LD = $(CURDIR)/build/entrypoint.o
+OFILES_LD += $(CURDIR)/build/entrypoint.o
 OFILES_LD += $(CURDIR)/build/inthandler.o
 OFILES_LD += $(CURDIR)/build/regs.o
 OFILES_LD += $(CURDIR)/build/ucode.o
 
-OFILES_LDS  = $(CURDIR)/build/system.o
+OFILES_LDS = $(CURDIR)/build/system.o
 
 # Rules for compiling system stuff
 $(CURDIR)/build/n64sys.o: $(CURDIR)/src/n64sys.c

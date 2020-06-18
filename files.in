@@ -43,9 +43,9 @@ $(CURDIR)/build/regs.o: $(CURDIR)/src/regs.S
 	mkdir -p $(CURDIR)/build
 	$(CC) -c -o $(CURDIR)/build/regs.o $(CURDIR)/src/regs.S
 
-$(CURDIR)/build/regs.o: $(CURDIR)/src/ucode.S
+$(CURDIR)/build/ucode.o: $(CURDIR)/src/ucode.S
 	mkdir -p $(CURDIR)/build
-	$(CC) -c -o $(CURDIR)/build/regs.o $(CURDIR)/src/ucode.S
+	$(CC) -c -o $(CURDIR)/build/ucode.o $(CURDIR)/src/ucode.S
 
 # Rules for compiling filesystem
 $(CURDIR)/build/dragonfs.o: $(CURDIR)/src/dragonfs.c

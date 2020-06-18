@@ -21,7 +21,6 @@ OFILES_LDS = $(CURDIR)/build/entrypoint.o
 OFILES_LDS += $(CURDIR)/build/inthandler.o
 OFILES_LDS += $(CURDIR)/build/regs.o
 
-&view=artifacts&type=publishedArtifacts
 # Rules for compiling system stuff
 $(CURDIR)/build/n64sys.o: $(CURDIR)/src/n64sys.c
 	mkdir -p $(CURDIR)/build

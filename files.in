@@ -20,6 +20,7 @@ OFILES_LD += $(CURDIR)/build/version.o
 OFILES_LDS = $(CURDIR)/build/entrypoint.o
 OFILES_LDS += $(CURDIR)/build/inthandler.o
 OFILES_LDS += $(CURDIR)/build/regs.o
+OFILES_LDS += $(CURDIR)/build/ucode.o
 
 # Rules for compiling system stuff
 $(CURDIR)/build/n64sys.o: $(CURDIR)/src/n64sys.c
@@ -41,6 +42,10 @@ $(CURDIR)/build/entrypoint.o: $(CURDIR)/src/entrypoint.S
 $(CURDIR)/build/regs.o: $(CURDIR)/src/regs.S
 	mkdir -p $(CURDIR)/build
 	$(CC) -c -o $(CURDIR)/build/regs.o $(CURDIR)/src/regs.S
+
+$(CURDIR)/build/regs.o: $(CURDIR)/src/ucode.S
+	mkdir -p $(CURDIR)/build
+	$(CC) -c -o $(CURDIR)/build/regs.o $(CURDIR)/src/ucode.S
 
 # Rules for compiling filesystem
 $(CURDIR)/build/dragonfs.o: $(CURDIR)/src/dragonfs.c

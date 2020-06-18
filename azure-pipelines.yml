@@ -8,7 +8,7 @@ trigger:
 jobs:
 - job: Windows
   pool:
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-latest'
   steps:
 
   - script: |
@@ -41,7 +41,7 @@ jobs:
     continueOnError: false
     
   - script: |
-      call "C:\Program Files (x86)\Microsoft Visual Studio\2017\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+      call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
 
       cl .\tools\chksum64.c
       cl .\tools\n64tool.c
@@ -104,82 +104,62 @@ jobs:
       outputStorageUri: 'outputStorageUri'
     displayName: Upload program to Blob storage
     #condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
-
-  - bash: |
-      curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/libdragon-win64.zip -u$USER:$KEY https://api.bintray.com/content/n64-tools/libdragon/binaries/$BUILD_BUILDNUMBER/libdragon-win64-$BUILD_BUILDNUMBER.zip;publish=1;
-    env:
-      USER: $(BinTrayUser)
-      KEY: $(BinTrayKey)
-    displayName: 'Upload to Bintray'
-    continueOnError: false
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
   
-- job: Linux
-  pool:
-    vmImage: 'ubuntu-16.04'
-  steps:
+# - job: Linux
+#   pool:
+#     vmImage: 'ubuntu-16.04'
+#   steps:
 
-  - bash: |   
-      sudo add-apt-repository ppa:jonathonf/gcc -y
-      sudo apt-get -qq update
+#   - bash: |   
+#       sudo add-apt-repository ppa:jonathonf/gcc -y
+#       sudo apt-get -qq update
 
-      sudo apt-get install -y build-essential software-properties-common
-      sudo apt-get install -y gcc-8 
-    displayName: 'Setup Environment'
-    continueOnError: false
+#       sudo apt-get install -y build-essential software-properties-common
+#       sudo apt-get install -y gcc-9
+#     displayName: 'Setup Environment'
+#     continueOnError: false
   
-  - bash: |
-      curl -L https://n64tools.blob.core.windows.net/binaries/N64-tools/mips64-gcc-toolchain/master/latest/gcc-toolchain-mips64-linux64.tar.gz --output gcc-toolchain-mips64-linux64.tar.gz
-      mkdir -p $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64
-      sudo tar -C $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64 -xhzvf gcc-toolchain-mips64-linux64.tar.gz
-    displayName: 'Get gcc-toolchain-mips64'
-    continueOnError: false
+#   - bash: |
+#       curl -L https://n64tools.blob.core.windows.net/binaries/N64-tools/mips64-gcc-toolchain/master/latest/gcc-toolchain-mips64-linux64.tar.gz --output gcc-toolchain-mips64-linux64.tar.gz
+#       mkdir -p $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64
+#       sudo tar -C $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64 -xhzvf gcc-toolchain-mips64-linux64.tar.gz
+#     displayName: 'Get gcc-toolchain-mips64'
+#     continueOnError: false
     
 
-  - bash: |      
-      export N64_INST="$BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64"
-      export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$N64_INST/x86_64-pc-linux-gnu/mips64-elf/lib
-      sudo ldconfig
+#   - bash: |      
+#       export N64_INST="$BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64"
+#       export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$N64_INST/x86_64-pc-linux-gnu/mips64-elf/lib
+#       sudo ldconfig
 
-      make tools
-      make tools-install
+#       make tools
+#       make tools-install
 
-      make
-      make install
-    displayName: 'Build SDK'
-    continueOnError: false
+#       make
+#       make install
+#     displayName: 'Build SDK'
+#     continueOnError: false
   
-  - bash: |
-      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/gcc-toolchain-mips64/
-      cp -a $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64/. $BUILD_ARTIFACTSTAGINGDIRECTORY/gcc-toolchain-mips64/
-    displayName: 'Move Artifacts to Staging Directory'
-    continueOnError: false
+#   - bash: |
+#       mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/gcc-toolchain-mips64/
+#       cp -a $BUILD_SOURCESDIRECTORY/gcc-toolchain-mips64/. $BUILD_ARTIFACTSTAGINGDIRECTORY/gcc-toolchain-mips64/
+#     displayName: 'Move Artifacts to Staging Directory'
+#     continueOnError: false
 
-  # Publish build artifacts to Azure Artifacts/TFS or a file share
-  - task: PublishBuildArtifacts@1
-    displayName: Publish Build Artifacts
-    inputs:
-      pathtoPublish: '$(Build.ArtifactStagingDirectory)'
-      artifactName: 'binaries-linux' 
-      publishLocation: 'Container' # Options: container, filePath
-      #targetPath: # Required when publishLocation == FilePath
-      parallel: true # Optional
-      #parallelCount: # Optional
+#   # Publish build artifacts to Azure Artifacts/TFS or a file share
+#   - task: PublishBuildArtifacts@1
+#     displayName: Publish Build Artifacts
+#     inputs:
+#       pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+#       artifactName: 'binaries-linux' 
+#       publishLocation: 'Container' # Options: container, filePath
+#       #targetPath: # Required when publishLocation == FilePath
+#       parallel: true # Optional
+#       #parallelCount: # Optional
 
-  - task: AzureCLI@1
-    inputs:
-      connectedServiceNameARM: 'MsdnAzureServiceRole'
-      scriptLocation: 'inlineScript'
-      inlineScript: 'az storage blob upload --account-name n64tools -f $(Build.ArtifactStagingDirectory)/libdragon-linux64.tar.gz -c binaries -n N64-tools/libdragon/$(Build.SourceBranchName)/latest/libdragon-linux64.tar.gz'
-    displayName: Upload linux binary to Blob storage
-
-  - bash: |
-      cd $BUILD_ARTIFACTSTAGINGDIRECTORY
-      tar -czf libdragon-linux64.tar.gz *
-      curl -X PUT -T $BUILD_ARTIFACTSTAGINGDIRECTORY/libdragon-linux64.tar.gz -u$USER:$KEY https://api.bintray.com/content/n64-tools/libgragon/binaries/$BUILD_BUILDNUMBER/libdragon-linux64-$BUILD_BUILDNUMBER.tar.gz;publish=1;
-    env:
-      USER: $(BinTrayUser)
-      KEY: $(BinTrayKey)
-    displayName: 'Upload to Bintray'
-    continueOnError: false
-    condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/develop'))
+#   - task: AzureCLI@1
+#     inputs:
+#       connectedServiceNameARM: 'MsdnAzureServiceRole'
+#       scriptLocation: 'inlineScript'
+#       inlineScript: 'az storage blob upload --account-name n64tools -f $(Build.ArtifactStagingDirectory)/libdragon-linux64.tar.gz -c binaries -n N64-tools/libdragon/$(Build.SourceBranchName)/latest/libdragon-linux64.tar.gz'
+#     displayName: Upload linux binary to Blob storage

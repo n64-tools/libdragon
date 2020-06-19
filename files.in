@@ -1,3 +1,4 @@
+# libdragon objects
 OFILES_LD = $(CURDIR)/build/audio.o
 OFILES_LD += $(CURDIR)/build/console.o
 OFILES_LD += $(CURDIR)/build/controller.o
@@ -5,24 +6,24 @@ OFILES_LD += $(CURDIR)/build/display.o
 OFILES_LD += $(CURDIR)/build/dma.o
 OFILES_LD += $(CURDIR)/build/do_ctors.o
 OFILES_LD += $(CURDIR)/build/dragonfs.o
+OFILES_LD += $(CURDIR)/build/entrypoint.o
 OFILES_LD += $(CURDIR)/build/exception.o
 OFILES_LD += $(CURDIR)/build/graphics.o
 OFILES_LD += $(CURDIR)/build/interrupt.o
+OFILES_LD += $(CURDIR)/build/inthandler.o
 OFILES_LD += $(CURDIR)/build/mempak.o
 OFILES_LD += $(CURDIR)/build/n64sys.o
 OFILES_LD += $(CURDIR)/build/rdp.o
+OFILES_LD += $(CURDIR)/build/regs.o
 OFILES_LD += $(CURDIR)/build/rsp.o
-OFILES_LD += $(CURDIR)/build/system.o
 OFILES_LD += $(CURDIR)/build/timer.o
 OFILES_LD += $(CURDIR)/build/tpak.o
+OFILES_LD += $(CURDIR)/build/ucode.o
 OFILES_LD += $(CURDIR)/build/version.o
 
-OFILES_LD += $(CURDIR)/build/entrypoint.o
-OFILES_LD += $(CURDIR)/build/inthandler.o
-OFILES_LD += $(CURDIR)/build/regs.o
-OFILES_LD += $(CURDIR)/build/ucode.o
-
+# dragonsys objects
 OFILES_LDS = $(CURDIR)/build/system.o
+
 
 # Rules for compiling system stuff
 $(CURDIR)/build/n64sys.o: $(CURDIR)/src/n64sys.c

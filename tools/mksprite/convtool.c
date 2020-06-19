@@ -13,12 +13,6 @@ int main( int argc, char *argv[] )
     uint8_t zero = 0;
     uint8_t val;
 
-    #ifndef _MSC_VER
-    int ret __attribute__ ((unused));
-    #else
-    int ret;
-    #endif
-
     /* Read in old width */
     fread( &val, sizeof( val ), 1, stdin );
 

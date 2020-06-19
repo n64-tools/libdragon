@@ -76,8 +76,8 @@ loadintvectorloop:
 	bnez t2,loadintvectorloop
 	nop
 
-	jal __do_global_ctors		/* call global constructors - required for cpp? */
-	nop
+	/*jal __do_global_ctors		/* call global constructors - required for cpp? */
+	nop */
 	jal main					/* call main app */
 	nop
 
@@ -90,8 +90,4 @@ intvector:
 	jr k1
 	nop
 
-	.section .data 				/* required for cpp was `.section .code` before merge rest of the file not there. */
-	.global __dso_handle
-	.weak   __dso_handle
-__dso_handle:
-	.long	0
+	.section .code

@@ -74,7 +74,7 @@ install: libdragon.a libdragonsys.a
 	install -m 0644 include/timer.h $(INSTALLDIR)/mips64-elf/include/timer.h
 	install -m 0644 include/tpak.h $(INSTALLDIR)/mips64-elf/include/tpak.h
 
-#	install -m 0644 include/ucode.S $(INSTALLDIR)/mips64-elf/include/ucode.S
+	install -m 0644 include/ucode.S $(INSTALLDIR)/mips64-elf/include/ucode.S
 
 	install -m 0644 libdragon.a $(INSTALLDIR)/mips64-elf/lib/libdragon.a
 	install -m 0644 libdragonsys.a $(INSTALLDIR)/mips64-elf/lib/libdragonsys.a

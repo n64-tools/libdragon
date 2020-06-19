@@ -18,7 +18,6 @@ OFILES_LD += $(CURDIR)/build/regs.o
 OFILES_LD += $(CURDIR)/build/rsp.o
 OFILES_LD += $(CURDIR)/build/timer.o
 OFILES_LD += $(CURDIR)/build/tpak.o
-OFILES_LD += $(CURDIR)/build/ucode.o
 OFILES_LD += $(CURDIR)/build/version.o
 
 # dragonsys objects
@@ -45,10 +44,6 @@ $(CURDIR)/build/entrypoint.o: $(CURDIR)/src/entrypoint.S
 $(CURDIR)/build/regs.o: $(CURDIR)/src/regs.S
 	mkdir -p $(CURDIR)/build
 	$(CC) -c -o $(CURDIR)/build/regs.o $(CURDIR)/src/regs.S
-
-$(CURDIR)/build/ucode.o: $(CURDIR)/src/ucode.S
-	mkdir -p $(CURDIR)/build
-	$(CC) -c -o $(CURDIR)/build/ucode.o $(CURDIR)/src/ucode.S
 
 # Rules for compiling filesystem
 $(CURDIR)/build/dragonfs.o: $(CURDIR)/src/dragonfs.c

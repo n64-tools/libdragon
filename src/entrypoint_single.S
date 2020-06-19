@@ -1,6 +1,6 @@
 /*
  *   N64 init code for GNU as
- *	entrypoint.S C99
+ *	entrypoint.S Single EP
  */
 
 #include "regs.S"
@@ -77,6 +77,8 @@ loadintvectorloop:
 	bnez t2,loadintvectorloop
 	nop
 
+	jal __do_global_ctors		/* call global constructors */
+	nop
 	jal main					/* call main app */
 	nop
 

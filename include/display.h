@@ -14,6 +14,19 @@
  */
 
 /**
+ * @brief Valid television types
+ */
+typedef enum
+{
+    /** @brief PAL */
+    TV_TYPE_PAL,
+    /** @brief NTSC */
+    TV_TYPE_NTSC,
+    /** @brief MPAL */
+    TV_TYPE_MPAL
+} tvtype_t;
+
+/**
  * @brief Valid video resolutions
  */
 typedef enum
@@ -38,7 +51,9 @@ typedef enum
     /** @brief 16 bits per pixel (5-5-5-1) */
     DEPTH_16_BPP,
     /** @brief 32 bits per pixel (8-8-8-8) */
-    DEPTH_32_BPP
+    DEPTH_32_BPP,
+    /** @brief 16 bits per pixel (5-5-5-1) with HW Dither */
+    DEPTH_16_BPP_DITHER
 } bitdepth_t;
 
 /** @brief Valid gamma correction settings */
@@ -62,7 +77,13 @@ typedef enum
     /** @brief Anti-aliasing and resampling with fetch-on-need */
     ANTIALIAS_RESAMPLE_FETCH_NEEDED,
     /** @brief Anti-aliasing and resampling with fetch-always */
-    ANTIALIAS_RESAMPLE_FETCH_ALWAYS
+    ANTIALIAS_RESAMPLE_FETCH_ALWAYS,
+    /** @brief Resampling anti-aliasing Divot off */
+    ANTIALIAS_RESAMPLE_NODIVOT,
+    /** @brief Anti-aliasing and resampling with fetch-on-need Divot off */
+    ANTIALIAS_RESAMPLE_FETCH_NEEDED_NODIVOT,
+    /** @brief Anti-aliasing and resampling with fetch-always Divot off */
+    ANTIALIAS_RESAMPLE_FETCH_ALWAYS_NODIVOT
 } antialias_t;
 
 /** @brief Display context */
@@ -73,6 +94,7 @@ extern "C" {
 #endif
 
 void display_init( resolution_t res, bitdepth_t bit, uint32_t num_buffers, gamma_t gamma, antialias_t aa );
+void display_init_ex( tvtype_t tv, resolution_t res, bitdepth_t bit, uint32_t num_buffers, gamma_t gamma, antialias_t aa );
 display_context_t display_lock();
 void display_show(display_context_t disp);
 void display_close();

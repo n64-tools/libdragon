@@ -1,6 +1,5 @@
 /*
  *   N64 init code for GNU as
- *	entrypoint.S C99
  */
 
 #include "regs.S"
@@ -89,7 +88,7 @@ intvector:
 	jr k1
 	nop
 
-	.section .data
+	.section .data /*was `.section .code` rest of the file not there. */
 	.global __dso_handle
 	.weak   __dso_handle
 __dso_handle:

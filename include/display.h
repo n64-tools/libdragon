@@ -40,9 +40,10 @@ typedef enum
     /** @brief 512x480 mode */
     RESOLUTION_512x480,
     /** @brief 512x240 mode, high-res progressive */
-    RESOLUTION_512x240,
-    /** @brief 640x240 mode, high-res progressive */
-    RESOLUTION_640x240,
+    //TODO: add resolutions to demo!!!
+    // RESOLUTION_512x240,
+    // /** @brief 640x240 mode, high-res progressive */
+    // RESOLUTION_640x240,
 } resolution_t;
 
 /** @brief Valid bit depths */

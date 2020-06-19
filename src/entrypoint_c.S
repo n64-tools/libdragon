@@ -1,6 +1,6 @@
 /*
  *   N64 init code for GNU as
- *	entrypoint.S C++
+ *	entrypoint.S C99
  */
 
 #include "regs.S"
@@ -36,22 +36,6 @@ data_init:
 	/* make sure code and data are actually written */
 	la a0,__text_start
 	la a1,__data_end
-	sub a1,a0
-	jal data_cache_hit_writeback_invalidate
-	nop
-
-	/* fill .sbss with 0s */
-	la a0, __sbss_start
-	la a1, __sbss_end
-sbss_init:
-	sd $0,(a0)
-	addiu a0,8
-	bltu a0,a1, sbss_init
-	nop
-
-	/* make sure .sbss is actually written */
-	la a0,__sbss_start
-	la a1,__sbss_end
 	sub a1,a0
 	jal data_cache_hit_writeback_invalidate
 	nop
@@ -93,8 +77,6 @@ loadintvectorloop:
 	bnez t2,loadintvectorloop
 	nop
 
-	jal __do_global_ctors		/* call global constructors */
-	nop
 	jal main					/* call main app */
 	nop
 
@@ -107,8 +89,4 @@ intvector:
 	jr k1
 	nop
 
-	.section .data
-	.global __dso_handle
-	.weak   __dso_handle
-__dso_handle:
-	.long	0
+	.section .code

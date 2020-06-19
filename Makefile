@@ -52,29 +52,35 @@ libdragonsys.a: $(OFILES_LDS)
 	$(AR) -rcs -o libdragonsys.a $(OFILES_LDS)
 
 install: libdragon.a libdragonsys.a
-	install -m 0644 libdragon.a $(INSTALLDIR)/mips64-elf/lib/libdragon.a
-	install -m 0644 n64.ld $(INSTALLDIR)/mips64-elf/lib/n64.ld
-	install -m 0644 header $(INSTALLDIR)/mips64-elf/lib/header
-	install -m 0644 libdragonsys.a $(INSTALLDIR)/mips64-elf/lib/libdragonsys.a
-	install -m 0644 include/n64sys.h $(INSTALLDIR)/mips64-elf/include/n64sys.h
-	install -m 0644 include/interrupt.h $(INSTALLDIR)/mips64-elf/include/interrupt.h
+	install -m 0644 include/audio.h $(INSTALLDIR)/mips64-elf/include/audio.h
+	install -m 0644 include/console.h $(INSTALLDIR)/mips64-elf/include/console.h
+	install -m 0644 include/controller.h $(INSTALLDIR)/mips64-elf/include/controller.h
+#install -m 0644 include/dfsinternal.h $(INSTALLDIR)/mips64-elf/include/dfsinternal.h
+	install -m 0644 include/dir.h $(INSTALLDIR)/mips64-elf/include/dir.h
+	install -m 0644 include/display.h $(INSTALLDIR)/mips64-elf/include/display.h
 	install -m 0644 include/dma.h $(INSTALLDIR)/mips64-elf/include/dma.h
 	install -m 0644 include/dragonfs.h $(INSTALLDIR)/mips64-elf/include/dragonfs.h
-	install -m 0644 include/audio.h $(INSTALLDIR)/mips64-elf/include/audio.h
-	install -m 0644 include/display.h $(INSTALLDIR)/mips64-elf/include/display.h
-	install -m 0644 include/console.h $(INSTALLDIR)/mips64-elf/include/console.h
-	install -m 0644 include/mempak.h $(INSTALLDIR)/mips64-elf/include/mempak.h
-	install -m 0644 include/controller.h $(INSTALLDIR)/mips64-elf/include/controller.h
-	install -m 0644 include/tpak.h $(INSTALLDIR)/mips64-elf/include/tpak.h
-	install -m 0644 include/graphics.h $(INSTALLDIR)/mips64-elf/include/graphics.h
-	install -m 0644 include/rdp.h $(INSTALLDIR)/mips64-elf/include/rdp.h
-	install -m 0644 include/rsp.h $(INSTALLDIR)/mips64-elf/include/rsp.h
-	install -m 0644 include/timer.h $(INSTALLDIR)/mips64-elf/include/timer.h
 	install -m 0644 include/exception.h $(INSTALLDIR)/mips64-elf/include/exception.h
-	install -m 0644 include/system.h $(INSTALLDIR)/mips64-elf/include/system.h
-	install -m 0644 include/dir.h $(INSTALLDIR)/mips64-elf/include/dir.h
+	install -m 0644 include/font.h $(INSTALLDIR)/mips64-elf/include/font.h
+	install -m 0644 include/graphics.h $(INSTALLDIR)/mips64-elf/include/graphics.h
+	install -m 0644 include/interrupt.h $(INSTALLDIR)/mips64-elf/include/interrupt.h
 	install -m 0644 include/libdragon.h $(INSTALLDIR)/mips64-elf/include/libdragon.h
+	install -m 0644 include/mempak.h $(INSTALLDIR)/mips64-elf/include/mempak.h
+	install -m 0644 include/n64sys.h $(INSTALLDIR)/mips64-elf/include/n64sys.h
+	install -m 0644 include/rdp.h $(INSTALLDIR)/mips64-elf/include/rdp.h
+#install -m 0644 include/regsinternal.h $(INSTALLDIR)/mips64-elf/include/regsinternal.h
+	install -m 0644 include/rsp.h $(INSTALLDIR)/mips64-elf/include/rsp.h
+	install -m 0644 include/system.h $(INSTALLDIR)/mips64-elf/include/system.h
+	install -m 0644 include/timer.h $(INSTALLDIR)/mips64-elf/include/timer.h
+	install -m 0644 include/tpak.h $(INSTALLDIR)/mips64-elf/include/tpak.h
+
 	install -m 0644 include/ucode.S $(INSTALLDIR)/mips64-elf/include/ucode.S
+
+	install -m 0644 libdragon.a $(INSTALLDIR)/mips64-elf/lib/libdragon.a
+	install -m 0644 libdragonsys.a $(INSTALLDIR)/mips64-elf/lib/libdragonsys.a
+
+	install -m 0644 n64.ld $(INSTALLDIR)/mips64-elf/lib/n64.ld
+	install -m 0644 header $(INSTALLDIR)/mips64-elf/lib/header
 
 clean:
 	rm -f *.o *.a

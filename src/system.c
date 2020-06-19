@@ -104,7 +104,7 @@ struct timeval;
 /**
  * @brief Master definition of errno
  */
-int errno;
+extern int errno;
 
 /* Externs from libdragon */
 extern int __bootcic;

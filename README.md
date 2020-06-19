@@ -1,10 +1,16 @@
 # Libdragon
+[![Windows Build Status](https://dev.azure.com/n64-tools/N64-Tools/_apis/build/status/N64-tools.libdragon-sdk)](https://dev.azure.com/n64-tools/N64-Tools/_build/latest?definitionId=2)
+[![Linux Docker Build Status](https://travis-ci.org/DragonMinded/libdragon.svg?branch=trunk)](https://travis-ci.org/DragonMinded/libdragon)
 
-[![Build Status](https://travis-ci.org/DragonMinded/libdragon.svg?branch=master)](https://travis-ci.org/DragonMinded/libdragon)
+# Download
+Architecture | Download Links
+--- | --- 
+Windows x64 | [Latest](https://n64tools.blob.core.windows.net/binaries/N64-tools/libdragon/master/latest/libdragon-win64.zip)
+Linux x64 | See [docker wrapper](https://github.com/anacierdem/libdragon-docker) to quickly get libdragon up and running.
 
 This is a simple library for N64 that allows one to code using the gcc compiler suite and nothing else. No proprietary library is needed.
 
-See [docker wrapper](https://github.com/anacierdem/libdragon-docker) to quickly get libdragon up and running.
+
 
 To get started from scratch, follow the following steps:
 
@@ -48,3 +54,7 @@ becomes;
 Basically all operands are required and separated by commas.
 
 While using these custom instructions, you should use `$v00`-`$v31` when naming vector registers and `$0`-`$31` when naming scalar registers.
+
+## Windows specific instructions for those that want to build locally!
+Due to the fact that windows does not include some header files needed for the tools, it is necessary to download them separately.
+Please look at the azure-pipelines.yml file, to see how the lib and tools are built in a windows environment.

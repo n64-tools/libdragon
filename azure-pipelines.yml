@@ -1,0 +1,106 @@
+
+trigger:
+  branches:
+    include: ["master", "trunk", "develop*", "release-*", "refs/tags/*" ]
+  paths:
+    exclude: [ "doc", "*.md", ".gitignore", "README.md" ]
+
+jobs:
+- job: Windows
+  pool:
+    vmImage: 'windows-latest'
+  steps:
+
+  - script: |
+      curl -L https://n64tools.blob.core.windows.net/binaries/N64-tools/mips64-gcc-toolchain/master/latest/gcc-toolchain-mips64-win64.zip --output gcc-toolchain-mips64-win64.zip
+      curl -L https://raw.githubusercontent.com/tronkko/dirent/master/include/dirent.h --output ./include/dirent.h
+      curl -L https://windows.php.net/downloads/php-sdk/deps/vc15/x64/libpng-1.6.34-2-vc15-x64.zip --output libpng.zip
+    displayName: 'Get dependencies'
+    continueOnError: false
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: 'gcc-toolchain-mips64-win64.zip' 
+      destinationFolder: gcc-toolchain-mips64
+      cleanDestinationFolder: false 
+    displayName: 'Extract gcc-toolchain-mips64-win64'
+    continueOnError: false
+
+  - task: ExtractFiles@1
+    inputs:
+      archiveFilePatterns: 'libpng.zip' 
+      destinationFolder: libpng
+      cleanDestinationFolder: false 
+    displayName: 'Extract libpng'
+    continueOnError: false
+
+  - bash: |
+      sed -i -- 's|rm -f \*\.o \*\.a|DEL /F \*\.o \*\.a|g' $BUILD_SOURCESDIRECTORY/Makefile
+      sed -i -- 's|rm -rf $(CURDIR)/build|RD /S /Q $(CURDIR)/build|g' $BUILD_SOURCESDIRECTORY/Makefile 
+    displayName: 'Adjust Make Files for Windows'
+    continueOnError: false
+    
+  - script: |
+      call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Auxiliary\Build\vcvarsall.bat" x64
+
+      cl .\tools\chksum64.c
+      cl .\tools\n64tool.c
+      cl .\tools\dumpdfs\dumpdfs.c -I .\include\
+      cl .\tools\mkdfs\mkdfs.c -I .\include\
+      cl .\tools\mksprite\convtool.c
+      cl /MT .\tools\mksprite\mksprite.c .\libpng\lib\libpng.lib /I .\libpng\include\libpng16\ /link 
+     
+      set N64_INST="%BUILD_SOURCESDIRECTORY%\gcc-toolchain-mips64"
+      set PATH=%PATH%;%BUILD_SOURCESDIRECTORY%\gcc-toolchain-mips64\bin
+      make libdragon
+    displayName: 'Build SDK'
+    continueOnError: false
+
+  - bash: |
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/tools/
+      cp "$BUILD_SOURCESDIRECTORY/"*.exe "$BUILD_ARTIFACTSTAGINGDIRECTORY/tools/"
+      cp "$BUILD_SOURCESDIRECTORY/libpng/bin/libpng.dll" "$BUILD_ARTIFACTSTAGINGDIRECTORY/tools/"
+
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/include/
+      cp "$BUILD_SOURCESDIRECTORY/include/"* "$BUILD_ARTIFACTSTAGINGDIRECTORY/include/"
+
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/lib/
+      cp "$BUILD_SOURCESDIRECTORY/"*.a "$BUILD_ARTIFACTSTAGINGDIRECTORY/lib/"
+      cp "$BUILD_SOURCESDIRECTORY/"*.x "$BUILD_ARTIFACTSTAGINGDIRECTORY/lib/"
+      cp "$BUILD_SOURCESDIRECTORY/header" "$BUILD_ARTIFACTSTAGINGDIRECTORY/lib/"
+    displayName: 'Move Artifacts to Staging Directory'
+    continueOnError: false
+
+  # Publish build artifacts to Azure Artifacts/TFS or a file share
+  - task: PublishBuildArtifacts@1
+    displayName: Publish Build Artifacts
+    inputs:
+      pathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      artifactName: 'binaries' 
+      publishLocation: 'Container' # Options: container, filePath
+      #targetPath: # Required when publishLocation == FilePath
+      parallel: true # Optional
+      #parallelCount: # Optional
+  
+  # Archive Files
+  # Archive files using compression formats such as .7z, .rar, .tar.gz, and .zip.
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: '$(Build.ArtifactStagingDirectory)' 
+      includeRootFolder: false
+      archiveType: 'zip' # Options: zip, 7z, tar, wim
+      #tarCompression: 'gz' # Optional. Options: gz, bz2, xz, none
+      archiveFile: '$(Build.ArtifactStagingDirectory)/libdragon-win64.zip' 
+      #replaceExistingArchive: true
+
+  - task: AzureFileCopy@3
+    inputs:
+      sourcePath: '$(Build.ArtifactStagingDirectory)\*.zip'
+      azureSubscription: 'MsdnAzureServiceRole'
+      Destination: 'AzureBlob'
+      storage: 'n64tools'
+      ContainerName: 'binaries'
+      blobPrefix: 'N64-tools/libdragon/$(Build.SourceBranchName)/latest/'
+      outputStorageUri: 'outputStorageUri'
+    displayName: Upload program to Blob storage
+    #condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))

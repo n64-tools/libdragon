@@ -5,10 +5,18 @@
 #include <string.h>
 #include <errno.h>
 #include <stdint.h>
+
 #include <sys/types.h>
+#ifndef _MSC_VER
+#include <dirent.h>
 #include <sys/param.h>
+#else
+#include "dirent.h"
+#endif // !_MSC_VER
+
 #include "dragonfs.h"
 #include "dfsinternal.h"
+
 
 #if BYTE_ORDER == BIG_ENDIAN
 #define SWAPLONG(i) (i)

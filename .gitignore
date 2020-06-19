@@ -1,5 +1,11 @@
 ## Build files
+*.elf
+*.o
+*.obj
 *.a
+*.bin
+*.dfs
+*.exe
 build/
 build_gcc/
 tools/chksum64
@@ -21,12 +27,9 @@ tools/n64tool
 
 *.v64
 *.z64
-*.elf
-*.bin
-*.o
-*.dfs
 
 node_modules
 
 ## Editors
 .vscode
+

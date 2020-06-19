@@ -76,8 +76,8 @@ loadintvectorloop:
 	bnez t2,loadintvectorloop
 	nop
 
-	/*jal __do_global_ctors		/* call global constructors - required for cpp? */
-	nop */
+	/* jal __do_global_ctors		/* call global constructors - required for cpp? */ */
+	/* nop */
 	jal main					/* call main app */
 	nop
 

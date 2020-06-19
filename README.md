@@ -1,6 +1,6 @@
 # Libdragon
 [![Windows Build Status](https://dev.azure.com/n64-tools/N64-Tools/_apis/build/status/N64-tools.libdragon-sdk)](https://dev.azure.com/n64-tools/N64-Tools/_build/latest?definitionId=2)
-[![Linux Docker Build Status](https://travis-ci.org/DragonMinded/libdragon.svg?branch=master)](https://travis-ci.org/DragonMinded/libdragon)
+[![Linux Docker Build Status](https://travis-ci.org/DragonMinded/libdragon.svg?branch=trunk)](https://travis-ci.org/DragonMinded/libdragon)
 
 # Download
 Architecture | Download Links

@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <dirent.h>
 #include <sys/stat.h>
 #include <string.h>
 #include <errno.h>
 #include <stdint.h>
-
 #include <sys/types.h>
 #ifndef _MSC_VER
 #include <dirent.h>

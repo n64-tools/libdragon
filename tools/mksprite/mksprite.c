@@ -46,7 +46,7 @@ int read_png( char *png_file, char *spr_file, uint8_t depth, uint8_t hslices, ui
     png_infop info_ptr;
     png_uint_32 width, height;
     int bit_depth, color_type, interlace_type;
-    uint8_t wval8;
+    int wval8;
     uint16_t wval16;
     FILE *fp;
     FILE *op;

@@ -12,6 +12,7 @@ OFILES_LD += $(CURDIR)/build/graphics.o
 OFILES_LD += $(CURDIR)/build/interrupt.o
 OFILES_LD += $(CURDIR)/build/inthandler.o
 OFILES_LD += $(CURDIR)/build/mempak.o
+OFILES_LD += $(CURDIR)/build/n64memory.o
 OFILES_LD += $(CURDIR)/build/n64sys.o
 OFILES_LD += $(CURDIR)/build/rdp.o
 OFILES_LD += $(CURDIR)/build/regs.o
@@ -28,6 +29,9 @@ OFILES_LDS = $(CURDIR)/build/system.o
 $(CURDIR)/build/n64sys.o: $(CURDIR)/src/n64sys.c
 	mkdir -p $(CURDIR)/build
 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/n64sys.o $(CURDIR)/src/n64sys.c
+$(CURDIR)/build/n64memory.o: $(CURDIR)/src/n64memory.c
+	mkdir -p $(CURDIR)/build
+	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/n64memory.o $(CURDIR)/src/n64memory.c
 $(CURDIR)/build/interrupt.o: $(CURDIR)/src/interrupt.c
 	mkdir -p $(CURDIR)/build
 	$(CC) $(CFLAGS) -c -o $(CURDIR)/build/interrupt.o $(CURDIR)/src/interrupt.c

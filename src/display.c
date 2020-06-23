@@ -51,7 +51,7 @@
  *
  * @param[in] x
  *            The cached address
- * 
+ *
  * @return The uncached address
  */
 #define UNCACHED_ADDR(x)    ((void *)(((uint32_t)(x)) | 0xA0000000))
@@ -292,6 +292,22 @@ void display_init_ex( tvtype_t tv, resolution_t res, bitdepth_t bit, uint32_t nu
             __registers[1 + REGISTER_COUNT] = 1024; /* base offset for field 2 */
             __registers[2] = 512; /* width */
             __registers[12] = 0x00000334; /* x-scale */
+            break;
+        case RESOLUTION_512x240: /* high-res progressive */
+            __width = 512;
+            __height = 240;
+            __registers[1] = 512; /* base offset for field 1 */
+            __registers[1 + REGISTER_COUNT] = 1024; /* base offset for field 2 */ //TODO: probably wrong
+            __registers[2] = 512; /* width */
+            __registers[12] = 0x00000334; /* x-scale */ //TODO: probably wrong
+            break;
+        case RESOLUTION_640x240: /* high-res progressive */
+            __width = 640;
+            __height = 240;
+            __registers[1] = 640; /* base offset for field 1 */
+            __registers[1 + REGISTER_COUNT] = 1280; /* base offset for field 2 */ //TODO: probably wrong
+            __registers[2] = 640; /* width */
+            __registers[12] = 0x00000400; /* x-scale */ //TODO: probably wrong
             break;
     }
     if ( bit == DEPTH_16_BPP )

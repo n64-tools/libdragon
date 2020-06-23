@@ -57,7 +57,7 @@
 #define UNCACHED_ADDR(x)    ((void *)(((uint32_t)(x)) | 0xA0000000))
 
 /**
- * @brief Align a memory address to 16 byte offset
+ * @brief Align a memory address to 64 byte offset
  *
  * @param[in] x
  *            Unaligned memory address

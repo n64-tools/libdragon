@@ -107,7 +107,7 @@ void *n64_realloc2(void *ptr, size_t size)
         if (NULL != ptr)
         {
 //            printf("\t0 != ptr\n");
-            n64_free(ptr);
+            n64_free2(ptr);
         }
 
         // "If size is 0, [...] a null pointer [...] shall be returned."
@@ -120,11 +120,11 @@ void *n64_realloc2(void *ptr, size_t size)
     if (NULL == ptr)
     {
 //        printf("0 == ptr\n");
-        return_buffer = n64_malloc(size);
+        return_buffer = n64_malloc2(size);
         goto realloc_return;
     }
 
-    return_buffer = n64_malloc(size);
+    return_buffer = n64_malloc2(size);
 
     // "If there is not enough available memory"
     if (NULL == return_buffer)
@@ -145,7 +145,7 @@ void *n64_realloc2(void *ptr, size_t size)
     {
 //        printf("0 == old_buffer\n");
 //        mapdump(kv_set);
-        return_buffer = n64_malloc(size);
+        return_buffer = n64_malloc2(size);
         goto realloc_return;
     }
 
@@ -165,7 +165,7 @@ void *n64_realloc2(void *ptr, size_t size)
 
     // "If the new size of the memory object would require movement of the object,
     // the space for the previous instantiation of the object is freed."
-    n64_free(ptr);
+    n64_free2(ptr);
 
     // single point of return
     realloc_return:
@@ -176,7 +176,7 @@ void *n64_realloc2(void *ptr, size_t size)
 void *n64_malloc2(size_t size_to_alloc, char *file, int line)
 {
     n64_memset(memory_log, 0x00, 256);
-    sprintf(memory_log, "n64_malloc(0x%08X): %s %d\n", size_to_alloc, file, line);
+    sprintf(memory_log, "n64_malloc2(0x%08X): %s %d\n", size_to_alloc, file, line);
 
     size_t adjusted_size = (size_to_alloc + 3) & ~3;
 /*
@@ -259,14 +259,14 @@ void *n64_memmove_naive_no_malloc2(void *dest, const void *src, size_t n)
 // A sample naive, literal implementation:
 void *n64_memmove_naive2(void *dest, const void *src, size_t n)
 {
-    void *tmp = (void *)n64_malloc(n);
+    void *tmp = (void *)n64_malloc2(n);
     if(NULL == tmp)
     {
         return dest;
     }
     n64_memcpy(tmp,src,n);
     n64_memcpy(dest,tmp,n);
-    n64_free(tmp);
+    n64_free2(tmp);
     return dest;
 }
 
@@ -286,7 +286,7 @@ void *n64_memmove2(void *dest, const void *src, size_t size)
     uint8_t  *d;
     uint8_t  *s;
 
-    void *tmp = (void *)n64_malloc(size);
+    void *tmp = (void *)n64_malloc2(size);
 
     if(NULL == tmp)
     {
@@ -347,7 +347,7 @@ void *n64_memmove2(void *dest, const void *src, size_t size)
         }
     }
 
-    n64_free(tmp);
+    n64_free2(tmp);
 
     memmove_return:
         return dest;
@@ -419,7 +419,7 @@ void *n64_memmove_old_with_potential_bug2(void *dest, const void *src, size_t si
         }
     }
 
-    n64_free(tmp);
+    n64_free2(tmp);
 
     return dest;
 }

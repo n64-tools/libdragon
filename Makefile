@@ -66,7 +66,6 @@ install: libdragon.a libdragonsys.a
 	install -m 0644 include/interrupt.h $(INSTALLDIR)/mips64-elf/include/interrupt.h
 	install -m 0644 include/libdragon.h $(INSTALLDIR)/mips64-elf/include/libdragon.h
 	install -m 0644 include/mempak.h $(INSTALLDIR)/mips64-elf/include/mempak.h
-	install -m 0644 include/n64sys.h $(INSTALLDIR)/mips64-elf/include/n64memory.h
 	install -m 0644 include/n64sys.h $(INSTALLDIR)/mips64-elf/include/n64sys.h
 	install -m 0644 include/rdp.h $(INSTALLDIR)/mips64-elf/include/rdp.h
 #install -m 0644 include/regsinternal.h $(INSTALLDIR)/mips64-elf/include/regsinternal.h

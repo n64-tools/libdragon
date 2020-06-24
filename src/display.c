@@ -436,11 +436,15 @@ void display_init_ex( tvtype_t tv, resolution_t res, bitdepth_t bit, uint32_t nu
     }
 
     /* Set the first buffer as the displaying buffer */
-    __write_dram_register( __safe_buffer[0] );
 
     now_showing = 0;
     now_drawing = -1;
     show_next = -1;
+
+    /* Show our screen normally */
+    //__registers[1] = (uintptr_t) __safe_buffer[0];
+    //__registers[9] = __reg_values[tv_type][9];
+    __write_registers( __registers );
 
     enable_interrupts();
 

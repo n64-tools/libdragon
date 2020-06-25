@@ -66,8 +66,12 @@ jobs:
 
       mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/lib/
       cp "$BUILD_SOURCESDIRECTORY/"*.a "$BUILD_ARTIFACTSTAGINGDIRECTORY/lib/"
-      cp "$BUILD_SOURCESDIRECTORY/"*.ld "$BUILD_ARTIFACTSTAGINGDIRECTORY/lib/"
-      cp "$BUILD_SOURCESDIRECTORY/header" "$BUILD_ARTIFACTSTAGINGDIRECTORY/lib/"
+
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/ldscripts/
+      cp "$BUILD_SOURCESDIRECTORY/"*.ld "$BUILD_ARTIFACTSTAGINGDIRECTORY/ldscripts/"
+
+      mkdir -p $BUILD_ARTIFACTSTAGINGDIRECTORY/headers/
+      cp "$BUILD_SOURCESDIRECTORY/headers/"* "$BUILD_ARTIFACTSTAGINGDIRECTORY/headers/"
     displayName: 'Move Artifacts to Staging Directory'
     continueOnError: false
 

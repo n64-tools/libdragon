@@ -161,10 +161,6 @@ int read_png( char *png_file, char *spr_file, uint8_t depth, uint8_t hslices, ui
             }
         }
 
-        // Set row pointer to the png struct
-        png_set_rows(png_ptr, info_ptr, row_pointers);
-
-
         /* Now it's time to read the image. */
         png_read_image(png_ptr, row_pointers);
 

@@ -198,7 +198,7 @@ static void audio_callback()
  *            The frequency in Hz to play back samples at
  * @param[in] numbuffers
  *            The number of buffers to allocate internally
- *  * @param[in] fill_buffer_callback
+ * @param[in] fill_buffer_callback
  *            A function to be called when more sample data is needed
  */
 void audio_init(const int frequency, int numbuffers)
@@ -310,6 +310,7 @@ void audio_set_buffer_callback(audio_fill_buffer_callback fill_buffer_callback)
 void audio_close()
 {
     set_AI_interrupt(0);
+    unregister_AI_handler(audio_callback);
     unregister_AI_handler(_callback);
 
     if(buffers)

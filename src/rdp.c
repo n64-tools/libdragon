@@ -605,7 +605,7 @@ uint32_t rdp_load_texture_stride( uint32_t texslot, uint32_t texloc, mirror_t mi
  *            Horizontal scaling factor
  * @param[in] y_scale
  *            Vertical scaling factor
- *  * @param[in] mirror
+ * @param[in] mirror
  *            Whether the texture should be mirrored
  */
 void rdp_draw_textured_rectangle_scaled( uint32_t texslot, int tx, int ty, int bx, int by, double x_scale, double y_scale,  mirror_t mirror)
@@ -682,7 +682,7 @@ void rdp_draw_textured_rectangle_scaled( uint32_t texslot, int tx, int ty, int b
  *            The pixel X location of the bottom right of the rectangle
  * @param[in] by
  *            The pixel Y location of the bottom right of the rectangle
- *  @param[in] mirror
+ * @param[in] mirror
  *            Whether the texture should be mirrored
  */
 void rdp_draw_textured_rectangle( uint32_t texslot, int tx, int ty, int bx, int by, mirror_t mirror )

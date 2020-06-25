@@ -911,6 +911,7 @@ static bool __is_transfer_pak( int controller )
  *
  * @retval #ACCESSORY_RUMBLEPAK The accessory connected is a rumblepak
  * @retval #ACCESSORY_MEMPAK The accessory connected is a mempak
+ * @retval #ACCESSORY_TRANSFERPAK The accessory connected is a transferpak
  * @retval #ACCESSORY_VRU The accessory connected is a VRU
  * @retval #ACCESSORY_NONE The accessory was not recognized
  */

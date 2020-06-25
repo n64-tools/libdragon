@@ -17,7 +17,7 @@
 
 #undef errno
 
-/** 
+/**
  * @defgroup system newlib Interface Hooks
  * @brief System hooks to provide low level threading and filesystem functionality to newlib.
  *
@@ -43,7 +43,7 @@
  * code if the file prefix matches, allowing code to make use of your filesystyem
  * without being rewritten.
  *
- * For example, your filesystem provides libdragon an interface to access a 
+ * For example, your filesystem provides libdragon an interface to access a
  * homebrew SD card interface.  You register a filesystem with "sd:/" as the prefix
  * and then attempt to open "sd://directory/file.txt".  The open callback for your
  * filesystem will be passed the file "/directory/file.txt".  The file handle returned
@@ -91,12 +91,12 @@
  */
 char *__env[1] = { 0 };
 
-/** 
+/**
  * @brief Environment variables
  */
 char **environ = __env;
 
-/** 
+/**
  * @brief Dummy declaration of timeval
  */
 struct timeval;
@@ -122,7 +122,7 @@ typedef struct
     /** @brief Filesystem prefix
      *
      * This controls what filesystem prefix should link to this filesystem
-     * (eg. 'rom:/' or 'cf:/') 
+     * (eg. 'rom:/' or 'cf:/')
      */
     char *prefix;
     /** @brief Filesystem callback pointers */
@@ -139,7 +139,7 @@ typedef struct
 {
     /** @brief Index into #filesystems */
     int fs_mapping;
-    /** @brief The handle assigned to this open file as returned by the 
+    /** @brief The handle assigned to this open file as returned by the
      *         filesystem code called to handle the open operation.  Will
      *         be passed to all subsequent file operations on the file. */
     void *handle;
@@ -312,7 +312,7 @@ static int __get_new_handle()
  *            Structure of callbacks for various functions in the filesystem.
  *            If the registered filesystem doesn't support an operation, it
  *            should leave the callback null.
- * 
+ *
  * @retval -1 if the parameters are invalid
  * @retval -2 if the prefix is already in use
  * @retval -3 if there are no more slots for filesystems
@@ -321,10 +321,10 @@ static int __get_new_handle()
 int attach_filesystem( const char * const prefix, filesystem_t *filesystem )
 {
     /* Sanity checking */
-    if( !prefix || !filesystem ) 
-    { 
+    if( !prefix || !filesystem )
+    {
         errno = EINVAL;
-        return -1; 
+        return -1;
     }
 
     /* Make sure prefix is valid */
@@ -395,10 +395,10 @@ int attach_filesystem( const char * const prefix, filesystem_t *filesystem )
 int detach_filesystem( const char * const prefix )
 {
     /* Sanity checking */
-    if( !prefix ) 
-    { 
+    if( !prefix )
+    {
         errno = EINVAL;
-        return -1; 
+        return -1;
     }
 
     for( int i = 0; i < MAX_FILESYSTEMS; i++ )
@@ -439,7 +439,7 @@ int detach_filesystem( const char * const prefix )
  *
  * @param[in] fileno
  *            File handle
- * 
+ *
  * @return Pointer to a filesystem callback structure or null if not found.
  */
 static filesystem_t *__get_fs_pointer_by_handle( int fileno )
@@ -862,7 +862,7 @@ int open( char *file, int flags, int mode )
                 errno = ENOMEM;
                 return -1;
             }
- 
+
             void *ptr = fs->open( file + __strlen( filesystems[mapping].prefix ), flags );
 
             if( ptr )
@@ -957,7 +957,7 @@ int read( int file, char *ptr, int len )
  *             Buffer to read the link into
  * @param[in]  bufsize
  *             Size of the buffer
- * 
+ *
  * @return 0 on success or a negative value on error.
  */
 int readlink( const char *path, char *buf, size_t bufsize )
@@ -1217,7 +1217,7 @@ int dir_findfirst( const char * const path, dir_t *dir )
         return -1;
     }
 
-    return fs->findfirst( (char *)path + + __strlen( filesystems[mapping].prefix ), dir );
+    return fs->findfirst( (char *)path + __strlen( filesystems[mapping].prefix ), dir );
 }
 
 /**

@@ -42,12 +42,12 @@
 /** @brief Structure used to interact with the PI registers */
 static volatile struct PI_regs_s * const PI_regs = (struct PI_regs_s *)0xa4600000;
 
-/** 
+/**
  * @brief Return whether the DMA controller is currently busy
  *
  * @return nonzero if the DMA controller is busy or 0 otherwise
  */
-volatile int dma_busy() 
+volatile int dma_busy()
 {
     return PI_regs->status & (PI_STATUS_DMA_BUSY | PI_STATUS_IO_BUSY);
 }
@@ -64,7 +64,7 @@ volatile int dma_busy()
  * @param[in]  len
  *             Length in bytes to read into ram_address
  */
-void dma_read(void * ram_address, unsigned long pi_address, unsigned long len) 
+void dma_read(void * ram_address, unsigned long pi_address, unsigned long len)
 {
     disable_interrupts();
 
@@ -72,7 +72,7 @@ void dma_read(void * ram_address, unsigned long pi_address, unsigned long len)
     MEMORY_BARRIER();
     PI_regs->ram_address = ram_address;
     MEMORY_BARRIER();
-    PI_regs->pi_address = (pi_address | 0x10000000) & 0x1FFFFFFF;
+    PI_regs->pi_address = pi_address; //(pi_address | 0x10000000) & 0x1FFFFFFF;
     MEMORY_BARRIER();
     PI_regs->write_length = len-1;
     MEMORY_BARRIER();
@@ -93,7 +93,7 @@ void dma_read(void * ram_address, unsigned long pi_address, unsigned long len)
  * @param[in] len
  *            Length in bytes to write to peripheral
  */
-void dma_write(void * ram_address, unsigned long pi_address, unsigned long len) 
+void dma_write(void * ram_address, unsigned long pi_address, unsigned long len)
 {
     disable_interrupts();
 
@@ -101,7 +101,7 @@ void dma_write(void * ram_address, unsigned long pi_address, unsigned long len)
     MEMORY_BARRIER();
     PI_regs->ram_address = ram_address;
     MEMORY_BARRIER();
-    PI_regs->pi_address = (pi_address | 0x10000000) & 0x1FFFFFFF;
+    PI_regs->pi_address = pi_address; //(pi_address | 0x10000000) & 0x1FFFFFFF;
     MEMORY_BARRIER();
     PI_regs->read_length = len-1;
     MEMORY_BARRIER();
@@ -144,7 +144,7 @@ uint32_t io_read(uint32_t pi_address)
  * @param[in] data
  *            32 bit value to write to peripheral
  */
-void io_write(uint32_t pi_address, uint32_t data) 
+void io_write(uint32_t pi_address, uint32_t data)
 {
     volatile uint32_t *uncached_address = (uint32_t *)(pi_address | 0xa0000000);
 

@@ -87,9 +87,13 @@
 #define CALC_BUFFER(x)  ( ( ( ( x ) / 25 ) >> 3 ) << 3 )
 
 /** @brief The actual frequency the AI will run at */
+static void (*_callback)() = NULL;
+/** @brief The actual frequency the AI will run at */
 static int _frequency = 0;
 /** @brief The number of buffers currently allocated */
 static int _num_buf = NUM_BUFFERS;
+/** @brief The number of samples to write into each buffer */
+static int _num_samp = 0;
 /** @brief The buffer size in bytes for each buffer allocated */
 static int _buf_size = 0;
 /** @brief Array of pointers to the allocated buffers */
@@ -194,10 +198,36 @@ static void audio_callback()
  *            The frequency in Hz to play back samples at
  * @param[in] numbuffers
  *            The number of buffers to allocate internally
- * @param[in] fill_buffer_callback
+ *  * @param[in] fill_buffer_callback
  *            A function to be called when more sample data is needed
  */
 void audio_init(const int frequency, int numbuffers)
+{
+    audio_init_ex(frequency, numbuffers, CALC_BUFFER(frequency) >> 2, NULL);
+}
+
+/**
+ * @brief Initialize the audio subsystem (extended)
+ *
+ * This function will set up the AI to play at a given frequency,
+ * allocate a number of back buffers to write data to using the
+ * specified max number of stereo samples, and set the provided
+ * callback function. Max samples must be even, and if the callback
+ * is NULL, the built-in callback is used.
+ *
+ * @note Before re-initializing the audio subsystem to a new playback
+ *       frequency, remember to call #audio_close.
+ *
+ * @param[in] frequency
+ *            The frequency in Hz to play back samples at
+ * @param[in] numbuffers
+ *            The number of buffers to allocate internally
+ * @param[in] maxsamples
+ *            The max number of stereo 16-bit samples each buffer will hold
+ * @param[in] cb
+ *            The callback function for audio interrupts
+ */
+void audio_init_ex(const int frequency, int numbuffers, int maxsamples, void (*cb)())
 {
     int clockrate;
 
@@ -234,11 +264,16 @@ void audio_init(const int frequency, int numbuffers)
     _frequency = 2 * clockrate / ((2 * clockrate / frequency) + 1);
 
     /* Set up hardware to notify us when it needs more data */
-    register_AI_handler(audio_callback);
+    if (cb)
+        _callback = cb;
+    else
+        _callback = audio_callback;
+    register_AI_handler(_callback);
     set_AI_interrupt(1);
 
     /* Set up buffers */
-    _buf_size = CALC_BUFFER(_frequency);
+    _num_samp = maxsamples & ~1; /* maxsamples MUST be even */
+    _buf_size =  _num_samp;
     _num_buf = (numbuffers > 1) ? numbuffers : NUM_BUFFERS;
     buffers = malloc(_num_buf * sizeof(short *));
 
@@ -275,7 +310,7 @@ void audio_set_buffer_callback(audio_fill_buffer_callback fill_buffer_callback)
 void audio_close()
 {
     set_AI_interrupt(0);
-    unregister_AI_handler(audio_callback);
+    unregister_AI_handler(_callback);
 
     if(buffers)
     {
@@ -295,6 +330,7 @@ void audio_close()
     }
 
     _frequency = 0;
+    _num_samp = 0;
     _buf_size = 0;
 }
 
@@ -325,7 +361,6 @@ void audio_pause(bool pause) {
         enable_interrupts();
 	}
 }
-
 /**
  * @brief Write a chunk of audio data
  *
@@ -445,6 +480,76 @@ int audio_get_frequency()
 int audio_get_buffer_length()
 {
     return _buf_size;
+}
+
+/**
+ * @brief Change the number of stereo samples to write to each buffer
+ *
+ * This function sets how many stereo samples to write to the audio
+ * buffers. It should be even so that the buffer length is divisible
+ * by eight bytes for DMA restrictions. It MUST be smaller than the
+ * max number of samples passed to #audio_init_ex, but is not checked.
+ *
+ * @param[in] numsamples
+ *            number of stereo samples to write to each buffer
+ */
+void audio_set_num_samples(int numsamples)
+{
+    _num_samp = numsamples & ~1; /* numsamples MUST be even */
+    _buf_size = _num_samp;
+}
+
+/**
+ * @brief Return the address of the next buffer to fill
+ *
+ * This function returns a pointer to the next buffer to fill with
+ * stereo 16-bit samples. The number of stereo samples to write may
+ * be found by calling #audio_get_buffer_length. Pointer is uncached.
+ *
+ * @param[in] lastbuf
+ *            pointer to previous buffer index
+ *
+ * @return Uncached pointer to the next available sample buffer
+ */
+short *audio_get_next_buffer(int *lastbuf)
+{
+    if(!buffers)
+    {
+        return NULL;
+    }
+
+    int next = (*lastbuf + 1) % _num_buf;
+    *lastbuf = next;
+    return UncachedShortAddr(buffers[next]);
+}
+
+/**
+ * @brief Start audio DMA on buffer
+ *
+ * This function sets the audio DMA for the indexed buffer (should be
+ * the same as set by #audio_get_next_buffer), and starts the DMA.
+ *
+ * @param[in] lastbuf
+ *            last buffer index returned by #audio_get_next_buffer
+ *
+ * @return 0 if audio DMA is full, or 1 if indexed buffer queued
+ */
+volatile int audio_send_buffer(int lastbuf)
+{
+    if (__full())
+        return 0;
+
+    /* Set up DMA */
+    AI_regs->address = UncachedAddr(buffers[lastbuf]);
+    MEMORY_BARRIER();
+    AI_regs->length = _num_samp << 2;
+    MEMORY_BARRIER();
+
+    /* Start DMA */
+    AI_regs->control = 1;
+    MEMORY_BARRIER();
+
+    return 1;
 }
 
 /** @} */ /* audio */

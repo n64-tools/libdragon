@@ -51,7 +51,7 @@
  *
  * @param[in] x
  *            The cached address
- *
+ * 
  * @return The uncached address
  */
 #define UNCACHED_ADDR(x)    ((void *)(((uint32_t)(x)) | 0xA0000000))
@@ -374,12 +374,12 @@ void display_init_ex( tvtype_t tv, resolution_t res, bitdepth_t bit, uint32_t nu
             else
             {
                 /* lo-res non-interlaced display */
-                __registers[6] = 0x20C; /* vsync */
-                __registers[10] = 0x002301FD; /* vstart for field 1 */
+                __registers[6] = 0x20D; /* vsync */
+                __registers[10] = 0x002501FF; /* vstart for field 1 */
                 __registers[10 + REGISTER_COUNT] = 0x002501FF; /* vstart for field 2 */
                 __registers[11] = 0x000E0204; /* vburst for field 1 */
                 __registers[11 + REGISTER_COUNT] = 0x000E0204; /* vburst for field 2 */
-                __registers[13] = 0x0000400; /* y-scale */
+                __registers[13] = 0x00000400; /* y-scale */
             }
             break;
         case TV_TYPE_MPAL:

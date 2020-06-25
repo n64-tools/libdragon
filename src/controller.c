@@ -12,7 +12,7 @@
  * @ingroup libdragon
  * @brief Controller and accessory interface.
  *
- * The controller subsystem is in charge of communication with all controllers 
+ * The controller subsystem is in charge of communication with all controllers
  * and accessories plugged into the N64.  The controller subsystem is responsible
  * for interfacing with the serial interface (SI) registers to provide controller
  * data, mempak and rumblepak interfacing, and EEPROM interfacing.
@@ -20,7 +20,7 @@
  * Code wishing to communicate with a controller or an accessory should first call
  * #controller_init.  Once the controller subsystem has been initialized, code can
  * either scan the controller interface for changes or perform direct reads from
- * the controller interface.  Controllers can be enumerated with 
+ * the controller interface.  Controllers can be enumerated with
  * #get_controllers_present.  Similarly, accessories can be enumerated with
  * #get_accessories_present and #identify_accesory.
  *
@@ -72,8 +72,8 @@ static struct controller_data current;
 /** @brief The previously sampled controller data */
 static struct controller_data last;
 
-/** 
- * @brief Initialize the controller subsystem 
+/**
+ * @brief Initialize the controller subsystem
  */
 void controller_init()
 {
@@ -172,7 +172,7 @@ int eeprom_present()
 
 /**
  * @brief Read a block from EEPROM
- * 
+ *
  * @param[in]  block
  *             Block to read data from.  The N64 accesses eeprom in 8 byte blocks.
  * @param[out] buf
@@ -182,8 +182,8 @@ void eeprom_read(int block, uint8_t * const buf)
 {
     static unsigned long long SI_eeprom_read_block[8] =
     {
-        0x0000000002080400,				// LSB is block
-        0xffffffffffffffff,				// return data will be this quad
+        0x0000000002080400,             // LSB is block
+        0xffffffffffffffff,             // return data will be this quad
         0xfe00000000000000,
         0,
         0,
@@ -193,7 +193,7 @@ void eeprom_read(int block, uint8_t * const buf)
     };
     static unsigned long long output[8];
 
-	SI_eeprom_read_block[0] = 0x0000000002080400 | (block & 255);
+    SI_eeprom_read_block[0] = 0x0000000002080400 | (block & 255);
     __controller_exec_PIF(SI_eeprom_read_block,output);
     memcpy( buf, &output[1], 8 );
 }
@@ -210,9 +210,9 @@ void eeprom_write(int block, const uint8_t * const data)
 {
     static unsigned long long SI_eeprom_write_block[8] =
     {
-        0x000000000a010500,				// LSB is block
-        0x0000000000000000,				// send data is this quad
-        0xfffe000000000000,				// MSB will be status of write
+        0x000000000a010500,             // LSB is block
+        0x0000000000000000,             // send data is this quad
+        0xfffe000000000000,             // MSB will be status of write
         0,
         0,
         0,
@@ -221,7 +221,7 @@ void eeprom_write(int block, const uint8_t * const data)
     };
     static unsigned long long output[8];
 
-	SI_eeprom_write_block[0] = 0x000000000a010500 | (block & 255);
+    SI_eeprom_write_block[0] = 0x000000000a010500 | (block & 255);
     memcpy( &SI_eeprom_write_block[1], data, 8 );
     __controller_exec_PIF(SI_eeprom_write_block,output);
 }
@@ -623,7 +623,7 @@ static void __get_accessories_present( struct controller_data *output )
  * @brief Return a bitmask specifying which controllers have recognized accessories
  *
  * Queries the controller interface and returns a bitmask specifying which
- * controllers have recognized accessories present.  See #CONTROLLER_1_INSERTED, 
+ * controllers have recognized accessories present.  See #CONTROLLER_1_INSERTED,
  * #CONTROLLER_2_INSERTED, #CONTROLLER_3_INSERTED and #CONTROLLER_4_INSERTED.
  *
  * @return A bitmask representing accessories recognized
@@ -911,7 +911,6 @@ static bool __is_transfer_pak( int controller )
  *
  * @retval #ACCESSORY_RUMBLEPAK The accessory connected is a rumblepak
  * @retval #ACCESSORY_MEMPAK The accessory connected is a mempak
- * @retval #ACCESSORY_TRANSFERPAK The accessory connected is a transferpak
  * @retval #ACCESSORY_VRU The accessory connected is a VRU
  * @retval #ACCESSORY_NONE The accessory was not recognized
  */
@@ -963,6 +962,29 @@ int identify_accessory( int controller )
 
     /* Couldn't identify */
     return ACCESSORY_NONE;
+}
+
+/**
+ * @brief Identify the controller connected to a controller port
+ *
+ * Given a controller port, identify the particular controller.
+ *
+ * @param[in] controller
+ *            The controller port (0-3) to identify controller on
+ *
+ * @retval #CONTROLLER_PAD The controller connected is a standard pad
+ * @retval #CONTROLLER_MOUSE The controller connected is a mouse
+ * @retval #CONTROLLER_KEYBOARD The controller connected is a keyboard
+ * @retval #CONTROLLER_NONE The controller port has no controller connected
+ */
+int identify_controller( int controller )
+{
+    struct controller_data output;
+
+    /* get the controller status bytes */
+    __get_accessories_present( &output );
+
+    return output.c[controller].data >> 24;
 }
 
 /**

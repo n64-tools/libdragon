@@ -299,7 +299,7 @@ void display_init_ex( tvtype_t tv, resolution_t res, bitdepth_t bit, uint32_t nu
             __registers[1] = 512; /* base offset for field 1 */
             __registers[1 + REGISTER_COUNT] = 1024; /* base offset for field 2 */ //TODO: probably wrong
             __registers[2] = 512; /* width */
-            __registers[12] = 0x00000334; /* x-scale */ //TODO: probably wrong
+            __registers[12] = 0x00000333; /* x-scale */
             break;
         case RESOLUTION_640x240: /* high-res progressive */
             __width = 640;
@@ -307,7 +307,7 @@ void display_init_ex( tvtype_t tv, resolution_t res, bitdepth_t bit, uint32_t nu
             __registers[1] = 640; /* base offset for field 1 */
             __registers[1 + REGISTER_COUNT] = 1280; /* base offset for field 2 */ //TODO: probably wrong
             __registers[2] = 640; /* width */
-            __registers[12] = 0x00000400; /* x-scale */ //TODO: probably wrong
+            __registers[12] = 0x00000400; /* x-scale */
             break;
     }
     if ( bit == DEPTH_16_BPP )
@@ -345,7 +345,7 @@ void display_init_ex( tvtype_t tv, resolution_t res, bitdepth_t bit, uint32_t nu
                 __registers[11 + REGISTER_COUNT] = 0x000D0269; /* vburst for field 2 */
                 __registers[13] = 0x02000800; /* y-scale */
             }
-            else
+            else //TODO: something here for high res non-interlaced (i.e.512x240)
             {
                 /* lo-res non-interlaced display */
                 __registers[6] = 0x271; /* vsync */
@@ -371,7 +371,7 @@ void display_init_ex( tvtype_t tv, resolution_t res, bitdepth_t bit, uint32_t nu
                 __registers[11 + REGISTER_COUNT] = 0x000E0204; /* vburst for field 2 */
                 __registers[13] = 0x02000800; /* y-scale */
             }
-            else
+            else //TODO: something here for high res non-interlaced (i.e.640x240)
             {
                 /* lo-res non-interlaced display */
                 __registers[6] = 0x20D; /* vsync */

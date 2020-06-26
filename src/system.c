@@ -102,9 +102,9 @@ char **environ = __env;
 struct timeval;
 
 /**
- * @brief Definition of errno, as it's defined as extern across stdlib
+ * @brief Master definition of errno
  */
-int errno;
+extern int errno;
 
 /* Externs from libdragon */
 extern int __bootcic;

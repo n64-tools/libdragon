@@ -373,7 +373,7 @@ static int __validate_region( uint8_t region )
         case 0x55:
         case 0x58:
         case 0x59:
-            /* Acceptible region */
+            /* Acceptable region */
             return 0;
     }
 

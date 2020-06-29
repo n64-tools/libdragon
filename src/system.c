@@ -3,15 +3,16 @@
  * @brief newlib Interface Hooks
  * @ingroup system
  */
-#include <_ansi.h>
-#include <_syslist.h>
-#include <limits.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <sys/times.h>
 #include <stdint.h>
 #include <malloc.h>
+#include <limits.h>
+#include <errno.h>
+#include <_ansi.h> //could use reent.h /stdlib.h?
+#include <_syslist.h>
+#include <sys/_types.h> //could use reent.h /stdlib.h?
+#include <sys/stat.h>
+#include <sys/times.h>
+
 #include "system.h"
 #include "n64sys.h"
 
@@ -40,7 +41,7 @@
  * Providing relevant hooks for calls that your filesystem supports and passing
  * the resulting structure to #attach_filesystem will hook your filesystem into
  * newlib.  Calls to POSIX file operations will be passed on to your filesystem
- * code if the file prefix matches, allowing code to make use of your filesystyem
+ * code if the file prefix matches, allowing code to make use of your filesystem
  * without being rewritten.
  *
  * For example, your filesystem provides libdragon an interface to access a 
@@ -162,7 +163,7 @@ int close( int fildes );
 /**
  * @brief Simple implementation of strlen
  *
- * @note We can't link against regular libraries, so this is reimplemented
+ * @note We can't link against regular libraries, so this is re-implemented
  *
  * @param[in] str
  *            Pointer to null-terminated string
@@ -185,7 +186,7 @@ static int __strlen( const char * const str )
 /**
  * @brief Simple implementation of memcpy
  *
- * @note We can't link against regular libraries, so this is reimplemented
+ * @note We can't link against regular libraries, so this is re-implemented
  *
  * @param[out] a
  *             Destination pointer to copy to
@@ -205,7 +206,7 @@ static void __memcpy( char * const a, const char * const b, int len )
 /**
  * @brief Simple implementation of strdup
  *
- * @note We can't link against regular libraries, so this is reimplemented
+ * @note We can't link against regular libraries, so this is re-implemented
  *
  * @param[in] in
  *            String to duplicate
@@ -223,9 +224,9 @@ static char *__strdup( const char * const in )
 }
 
 /**
- * @brief Simple iplementation of strncmp
+ * @brief Simple implementation of strncmp
  *
- * @note We can't link against regular libraries, so this is reimplemented
+ * @note We can't link against regular libraries, so this is re-implemented
  *
  * @param[in] a
  *            First string to compare against

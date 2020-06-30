@@ -298,7 +298,7 @@ void display_init_ex( tvtype_t tv, resolution_t res, bitdepth_t bit, uint32_t nu
             __width = 512;
             __height = 240;
             __registers[1] = 512; /* base offset for field 1 */
-            __registers[1 + REGISTER_COUNT] = 240; /* base offset for field 2 */ //TODO: probably wrong
+            __registers[1 + REGISTER_COUNT] = 512; /* base offset for field 2 */ //TODO: probably wrong
             __registers[2] = 512; /* width */
             __registers[12] = 0x00000333; /* x-scale */
             break;

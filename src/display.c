@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <malloc.h>
 #include <string.h>
+#include "display.h"
 #include "libdragon.h"
 
 /**

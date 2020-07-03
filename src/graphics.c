@@ -27,7 +27,7 @@
  * two versions of graphics functions are available: a transparent variety and
  * a non-transparent variety.  Code that wishes to display sprites without
  * transparency can get a slight performance boost by using the non-transparent
- * viariety of calls since no software alpha blending needs to occur.  Once
+ * variety of calls since no software alpha blending needs to occur.  Once
  * code has finished drawing to the display context, it can be displayed to the
  * screen using #display_show.
  *
@@ -740,6 +740,35 @@ void graphics_draw_character( display_context_t disp, int x, int y, char ch )
  */
 void graphics_draw_text( display_context_t disp, int x, int y, const char * const msg )
 {
+    graphics_draw_text_ex( disp, x, y, 8, 8, msg ); //standard size font
+}
+
+/**
+ * @brief Draw a null terminated string to a display context
+ *
+ * Draw a string to the screen, following a few simple rules.  Standard ASCII is supported, as well
+ * as \\r, \\n, space and tab.  \\r and \\n will both cause the next character to be rendered one line
+ * lower and at the x coordinate specified in the parameters.  The tab character inserts five spaces.
+ *
+ * This function does not support alpha blending, only binary transparency.  If the background color is 
+ * fully transparent, the font is drawn with no background.  Otherwise, the font is drawn on a fully 
+ * colored background.  The foreground and background can be set using #graphics_set_color.
+ *
+ * @param[in] disp
+ *            The currently active display context.
+ * @param[in] x
+ *            The X coordinate to place the top left pixel of the character drawn.
+ * @param[in] y
+ *            The Y coordinate to place the top left pixel of the character drawn.
+ * @param[in] tx_w
+ *            The width of the character drawn.
+ * @param[in] tx_h
+ *            The height of the character drawn.
+ * @param[in] msg
+ *            The ASCII null terminated string to draw to the screen.
+ */
+void graphics_draw_text_ex( display_context_t disp, int x, int y, int tx_w, int tx_h, const char * const msg )
+{
     if( disp == 0 ) { return; }
     if( msg == 0 ) { return; }
 
@@ -753,14 +782,14 @@ void graphics_draw_text( display_context_t disp, int x, int y, const char * cons
         {
             case '\r':
             case '\n':
-                tx = x;
-                ty += 8;
+                tx = tx_w;
+                ty += tx_h;
                 break;
             case ' ':
-                tx += 5; // My font
+                tx += tx_w;
                 break;
             case '\t':
-                tx += 5 * 5; ; // My font
+                tx += tx_w * tx_w;
                 break;
 			case '#':
 				highlight = !highlight;
@@ -804,7 +833,7 @@ void graphics_draw_text( display_context_t disp, int x, int y, const char * cons
 				break;
             default:
                 graphics_draw_character( disp, tx, ty, *text );
-                tx += 5; ; // My font
+                tx += tx_w;
                 break;
         }
 

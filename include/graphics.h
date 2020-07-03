@@ -69,6 +69,7 @@ void graphics_fill_screen( display_context_t disp, uint32_t c );
 void graphics_set_color( uint32_t forecolor, uint32_t backcolor );
 void graphics_draw_character( display_context_t disp, int x, int y, char c );
 void graphics_draw_text( display_context_t disp, int x, int y, const char * const msg );
+void graphics_draw_text_ex( display_context_t disp, int x, int y, int tx_w, int tx_h, const char * const msg );
 void graphics_draw_sprite( display_context_t disp, int x, int y, sprite_t *sprite );
 void graphics_draw_sprite_stride( display_context_t disp, int x, int y, sprite_t *sprite, int offset );
 void graphics_draw_sprite_trans( display_context_t disp, int x, int y, sprite_t *sprite );

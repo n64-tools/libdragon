@@ -48,7 +48,7 @@ jobs:
       cl .\tools\dumpdfs\dumpdfs.c -I .\include\
       cl .\tools\mkdfs\mkdfs.c -I .\include\
       cl .\tools\mksprite\convtool.c
-      cl /MT .\tools\mksprite\mksprite.c .\libpng\lib\libpng.lib /I .\libpng\include\libpng16\ /link 
+      cl /MD .\tools\mksprite\mksprite.c .\libpng\lib\libpng.lib /I .\libpng\include\libpng16\ /link 
      
       set N64_INST="%BUILD_SOURCESDIRECTORY%\gcc-toolchain-mips64"
       set PATH=%PATH%;%BUILD_SOURCESDIRECTORY%\gcc-toolchain-mips64\bin

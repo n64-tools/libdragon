@@ -14,8 +14,12 @@
 
 #define FORMAT_UNCOMPRESSED 0
 
+#ifndef _MSC_VER
 #if BYTE_ORDER == BIG_ENDIAN
 #define SWAP_WORD(x) (x)
+#else
+#define SWAP_WORD(x) ((((x)>>8) & 0x00FF) | (((x)<<8) & 0xFF00))
+#endif
 #else
 #define SWAP_WORD(x) ((((x)>>8) & 0x00FF) | (((x)<<8) & 0xFF00))
 #endif
@@ -36,7 +40,7 @@ void write_value( uint8_t *colorbuf, FILE *fp, int bitdepth )
     }
 }
 
-int read_png( char *png_file, char *spr_file, int depth, int hslices, int vslices )
+int read_png( char *png_file, char *spr_file, uint8_t depth, uint8_t hslices, uint8_t vslices )
 {
     png_structp png_ptr;
     png_infop info_ptr;
@@ -46,15 +50,15 @@ int read_png( char *png_file, char *spr_file, int depth, int hslices, int vslice
     uint16_t wval16;
     FILE *fp;
     FILE *op;
-    int err = 0;
+    errno_t err = 0;
 
     /* Open file descriptors for read and write */
-    if ((fp = fopen(png_file, "rb")) == NULL)
+    if ((err = fopen_s(&fp, png_file, "rb")) != 0)
     {
         return -ENOENT;
     }
 
-    if ((op = fopen(spr_file, "wb")) == NULL)
+    if ((err = fopen_s(&op, spr_file, "wb")) != 0)
     {
         fclose(fp);
 
@@ -145,18 +149,13 @@ int read_png( char *png_file, char *spr_file, int depth, int hslices, int vslice
 
     /* Keep the variably sized array scoped so we can goto past it */
     {
-        /* The easiest way to read the image (all at once) */
-        png_bytep *row_pointers = malloc(height);
-        memset( row_pointers, 0, sizeof( png_bytep ) * height );
-
-        for( int row = 0; row < height; row++ )
-        {
-            row_pointers[row] = malloc(png_get_rowbytes(png_ptr, info_ptr));
-
+        png_bytep *row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * height);
+        for (unsigned int row = 0; row < height; row++) {
+            row_pointers[row] = (png_byte*)malloc(png_get_rowbytes(png_ptr, info_ptr));
             if( row_pointers[row] == NULL )
             {
                 fprintf(stderr, "Unable to allocate space for row pointers!\n");
-
+                
                 err = -ENOMEM;
                 goto exitmem;
             }
@@ -172,9 +171,9 @@ int read_png( char *png_file, char *spr_file, int depth, int hslices, int vslice
                 /* No alpha channel, must set to default full opaque */
                 fprintf(stderr, "No alpha channel, substituting full opaque!\n");
 
-                for( int j = 0; j < height; j++)
+                for(unsigned int j = 0; j < height; j++)
                 {
-                    for( int i = 0; i < width; i++ )
+                    for(unsigned int i = 0; i < width; i++ )
                     {
                         uint8_t buf[4];
 
@@ -190,9 +189,9 @@ int read_png( char *png_file, char *spr_file, int depth, int hslices, int vslice
                 break;
             case PNG_COLOR_TYPE_RGB_ALPHA:
                 /* Easy, just dump rows or convert */
-                for( int row = 0; row < height; row++ )
+                for(unsigned int row = 0; row < height; row++ )
                 {
-                    for( int col = 0; col < width; col++ )
+                    for(unsigned int col = 0; col < width; col++ )
                     {
                         write_value( &row_pointers[row][col * 4], op, depth );
                     }
@@ -203,7 +202,7 @@ int read_png( char *png_file, char *spr_file, int depth, int hslices, int vslice
 
 exitmem:
         /* Free the row pointers memory */
-        for( int row = 0; row < height; row++ )
+        for(unsigned int row = 0; row < height; row++ )
         {
             if( row_pointers[row] )
             {
@@ -237,7 +236,7 @@ void print_args( char * name )
 
 int main( int argc, char *argv[] )
 {
-    int bitdepth;
+    uint8_t bitdepth;
 
     if( argc != 4 && argc != 6 )
     {
@@ -246,7 +245,7 @@ int main( int argc, char *argv[] )
     }
 
     /* Covert bitdepth argument */
-    bitdepth = atoi( argv[1] );
+    bitdepth = (uint8_t)atoi( argv[1] );
 
     if( bitdepth == 32 )
     {
@@ -269,8 +268,8 @@ int main( int argc, char *argv[] )
     }
     else
     {
-        int hslices = atoi( argv[2] );
-        int vslices = atoi( argv[3] );
+        uint8_t hslices = (uint8_t)atoi( argv[2] );
+        uint8_t vslices = (uint8_t)atoi( argv[3] );
 
         /* Translate, return result */
         return read_png( argv[4], argv[5], bitdepth, hslices, vslices );

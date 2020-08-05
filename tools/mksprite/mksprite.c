@@ -155,7 +155,7 @@ int read_png( char *png_file, char *spr_file, uint8_t depth, uint8_t hslices, ui
             if( row_pointers[row] == NULL )
             {
                 fprintf(stderr, "Unable to allocate space for row pointers!\n");
-       
+                
                 err = -ENOMEM;
                 goto exitmem;
             }

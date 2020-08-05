@@ -312,4 +312,3 @@ endint:
 	.lcomm saveFR30, 8
 	.lcomm saveFR31, 8
 	.lcomm exception_stack, 65*1024
-

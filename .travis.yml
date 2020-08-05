@@ -15,3 +15,4 @@ script:
   - docker pull anacierdem/libdragon:toolchain
   - docker run --name=libdragon -d --mount type=bind,source=$(pwd),target=/libdragon -w=/libdragon anacierdem/libdragon:toolchain tail -f /dev/null
   - docker exec libdragon /bin/bash ./build.sh
+  

@@ -166,15 +166,22 @@ int output_zeros(FILE *dest, int amount)
 		return -1;
 	}
 	
-	int i;
-	while (amount > 0) {
-		int sz = amount;
-		if (sz > sizeof(zero))
-			sz = sizeof(zero);
-		fwrite(zero, 1, sz, dest);
-		amount -= sz;
+	if(amount <= 0)
+	{
+		/* We are done */
+		return 0;
 	}
-
+	
+	int i;
+	
+	for(i = 0; i < (amount >> 2); i++)
+	{
+		/* Write out a word at a time */
+		uint32_t byte = 0;
+		
+		fwrite(&byte, 1, 4, dest);
+	}
+	
 	return 0;
 }
 
@@ -345,7 +352,7 @@ int main(int argc, char *argv[])
 						
 						if(output_zeros(write_file, num_zeros))
 						{
-							fprintf(stderr, "Invalid offset to seek to in %s!\n", output);
+							fprintf(stderr, "Invalid offset to seek to!\n");
 							return -1;
 						}
 						
@@ -432,7 +439,7 @@ int main(int argc, char *argv[])
 		
 		if(output_zeros(write_file, num_zeros))
 		{
-			fprintf(stderr, "Couldn't pad image in %s!\n", output);
+			fprintf(stderr, "Couldn't pad image!\n");
 			return -1;
 		}
 		

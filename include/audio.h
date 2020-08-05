@@ -25,6 +25,8 @@ extern "C" {
  */
 typedef void(*audio_fill_buffer_callback)(short *buffer, size_t numsamples);
 
+void audio_init_ex(const int frequency, int numbuffers, int maxsamples, void (*cb)());
+
 void audio_init(const int frequency, int numbuffers);
 void audio_set_buffer_callback(audio_fill_buffer_callback fill_buffer_callback);
 void audio_pause(bool pause);
@@ -34,6 +36,9 @@ void audio_write_silence();
 void audio_close();
 int audio_get_frequency();
 int audio_get_buffer_length();
+void audio_set_num_samples(int numsamples);
+short *audio_get_next_buffer(int *lastbuf);
+volatile int audio_send_buffer(int lastbuf);
 
 #ifdef __cplusplus
 }

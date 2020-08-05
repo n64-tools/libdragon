@@ -80,7 +80,7 @@ install: libdragon.a libdragonsys.a
 	install -m 0644 libdragonsys.a $(INSTALLDIR)/mips64-elf/lib/libdragonsys.a
 
 	install -m 0644 n64.ld $(INSTALLDIR)/mips64-elf/lib/n64.ld
-	install -m 0644 header $(INSTALLDIR)/mips64-elf/lib/header
+	install -m 0644 headers/header $(INSTALLDIR)/mips64-elf/lib/header
 
 clean:
 	rm -f *.o *.a

@@ -70,6 +70,7 @@ void rdp_set_default_clipping( void );
 void rdp_enable_primitive_fill( void );
 void rdp_enable_blend_fill( void );
 void rdp_enable_texture_copy( void );
+void rdp_enable_texture_copy_flags( uint32_t flags1, uint32_t flags2 );
 uint32_t rdp_load_texture( uint32_t texslot, uint32_t texloc, mirror_t mirror, sprite_t *sprite );
 uint32_t rdp_load_texture_stride( uint32_t texslot, uint32_t texloc, mirror_t mirror, sprite_t *sprite, int offset );
 void rdp_draw_textured_rectangle( uint32_t texslot, int tx, int ty, int bx, int by,  mirror_t mirror );
@@ -82,6 +83,8 @@ void rdp_draw_filled_rectangle( int tx, int ty, int bx, int by );
 void rdp_draw_filled_triangle( float x1, float y1, float x2, float y2, float x3, float y3 );
 void rdp_set_texture_flush( flush_t flush );
 void rdp_close( void );
+
+void rdp_DrawImageBig(int x, int y, sprite_t *image);
 
 #ifdef __cplusplus
 }

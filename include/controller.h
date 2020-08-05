@@ -14,7 +14,7 @@
 /**
  * @name Bitmasks for controller status
  * @see #get_controllers_present
- * @see #get_accessories_present    
+ * @see #get_accessories_present
  * @{
  */
 /** @brief Controller 1 Inserted */
@@ -42,6 +42,21 @@
 #define ACCESSORY_VRU           3
 /** @brief Transferpak present */
 #define ACCESSORY_TRANSFERPAK    4
+/** @} */
+
+/**
+ * @name Controller ID Values
+ * @see #identify_controller
+ * @{
+ */
+/** @brief No controller present */
+#define CONTROLLER_NONE         0xFF
+/** @brief Mouse present */
+#define CONTROLLER_MOUSE        2
+/** @brief Keyboard present */
+#define CONTROLLER_KEYBOARD     4 // ?? fixme!
+/** @brief Digital pad present */
+#define CONTROLLER_PAD          5
 /** @} */
 
 /**
@@ -192,6 +207,7 @@ int get_dpad_direction( int controller );
 int read_mempak_address( int controller, uint16_t address, uint8_t *data );
 int write_mempak_address( int controller, uint16_t address, uint8_t *data );
 int identify_accessory( int controller );
+int identify_controller( int controller );
 void rumble_start( int controller );
 void rumble_stop( int controller );
 void execute_raw_command( int controller, int command, int bytesout, int bytesin, unsigned char *out, unsigned char *in );

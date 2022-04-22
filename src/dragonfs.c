@@ -95,9 +95,6 @@ static inline void grab_sector(void *cart_loc, void *ram_loc)
     data_cache_hit_writeback_invalidate(ram_loc, SECTOR_SIZE);
 
     dma_read((void *)(((uint32_t)ram_loc) & 0x1FFFFFFF), (uint32_t)cart_loc, SECTOR_SIZE);
-    
-    /* Fresh cache again */
-    data_cache_hit_invalidate(ram_loc, SECTOR_SIZE);
 }
 
 /**
@@ -206,7 +203,7 @@ static inline int data_left_in_sector(uint32_t loc)
  */
 static inline uint32_t get_flags(directory_entry_t *dirent)
 {
-    return (dirent->flags >> 24) & 0x000000FF;
+    return (dirent->flags >> 28) & 0x0000000F;
 }
 
 /**
@@ -219,7 +216,7 @@ static inline uint32_t get_flags(directory_entry_t *dirent)
  */
 static inline uint32_t get_size(directory_entry_t *dirent)
 {
-    return dirent->flags & 0x00FFFFFF;
+    return dirent->flags & 0x0FFFFFFF;
 }
 
 /**
@@ -252,55 +249,19 @@ static inline directory_entry_t *get_next_entry(directory_entry_t *dirent)
 }
 
 /**
- * @brief Get the file pointer from a directory entry
+ * @brief Get the file starting location from a directory entry
  *
- * This function is used to grab the first sector of a file given the current
+ * This function is used to grab the starting location of a file given the current
  * directory pointer.
  *
  * @param[in] dirent
  *            Directory entry to retrieve file pointer from
  *
- * @return A pointer to the first sector of a file.
+ * @return A location of the start of the file.
  */
-static inline file_entry_t *get_first_sector(directory_entry_t *dirent)
+static inline uint32_t get_start_location(directory_entry_t *dirent)
 {
-    return (file_entry_t *)(dirent->file_pointer ? (dirent->file_pointer + base_ptr) : 0);
-}
-
-/**
- * @brief Get the next file sector given a current file sector
- *
- * @param[in] fileent
- *            File entry structure to retrieve next sector from
- *
- * @return A pointer to the next sector of a file.
- */
-static inline file_entry_t *get_next_sector(file_entry_t *fileent)
-{
-    return (file_entry_t *)(fileent->next_sector ? (fileent->next_sector + base_ptr) : 0);
-}
-
-/**
- * @brief Walk forward in a file a specified number of sectors
- *
- * @param[in] file
- *            Open file structure
- * @param[in] num_sectors
- *            Number of sectors to advance the file
- */
-static void walk_sectors(open_file_t *file, uint32_t num_sectors)
-{
-    /* Update the sector number */
-    file->sector_number += num_sectors;
-
-    /* Walk forward num_sectors */
-    while(num_sectors)
-    {
-        file_entry_t *next_sector = get_next_sector(&file->cur_sector);
-        grab_sector(next_sector, &file->cur_sector);
-
-        num_sectors--;
-    }
+    return (dirent->file_pointer ? (dirent->file_pointer + base_ptr) : 0);
 }
 
 /**
@@ -531,6 +492,9 @@ static int recurse_path(const char * const path, int mode, directory_entry_t **d
     int last_type = TYPE_ANY;
     int ignore = 1; // Do not, by default, read again during the first while
 
+    /* Initialize token to avoid -Werror=maybe-uninitialized errors */
+    token[0] = 0;
+
     /* Save directory stack */
     memcpy(dir_stack, directories, sizeof(uint32_t) * MAX_DIRECTORY_DEPTH);
 
@@ -663,7 +627,8 @@ static int __dfs_init(uint32_t base_fs_loc)
     directory_entry_t id_node;
     grab_sector((void *)base_fs_loc, &id_node);
 
-    if(id_node.flags == FLAGS_ID && id_node.next_entry == NEXTENTRY_ID)
+    if(id_node.flags == ROOT_FLAGS && id_node.next_entry == ROOT_NEXT_ENTRY && 
+        !strcmp(id_node.path, ROOT_PATH))
     {
         /* Passes, set up the FS */
         base_ptr = base_fs_loc;
@@ -821,9 +786,8 @@ int dfs_open(const char * const path)
     file->handle = next_handle++;
     file->size = get_size(&t_node);
     file->loc = 0;
-    file->sector_number = 0;
-    file->start_sector = get_first_sector(&t_node);
-    grab_sector(file->start_sector, &file->cur_sector);
+    file->cart_start_loc = get_start_location(&t_node);
+    file->cached_loc = 0xFFFFFFFF;
 
     return file->handle;
 }
@@ -859,7 +823,7 @@ int dfs_close(uint32_t handle)
  * @param[in] offset
  *            A byte offset from the origin to seek from.
  * @param[in] origin
- *            An offset to seek from.  Either #SEEK_SET, #SEEK_CUR or #SEEK_END.
+ *            An offset to seek from.  Either `SEEK_SET`, `SEEK_CUR` or `SEEK_END`.
  *  
  * @return DFS_ESUCCESS on success or a negative value on error.
  */
@@ -989,50 +953,75 @@ int dfs_read(void * const buf, int size, int count, uint32_t handle)
         to_read = file->size - file->loc;
     }
 
-    /* Soemthing we can actually incriment! */
-    uint8_t *data = buf;
+    if (!to_read)
+        return 0;
 
-    /* Loop in, reading data in the cached sector */
-    while(to_read)
+    /* Fast-path. If possibly, we want to DMA directly into the destination
+     * buffer, without using any intermediate buffers. The rules are convoluted
+     * because we try to squeeze maximum performance here and thus we rely also
+     * on undocumented behaviors of PI DMA.
+     * The rules we follow are:
+     *
+     *   * The RDRAM destination pointer must be 8-bytes aligned.
+     *   * The ROM location must be 2-bytes aligned.
+     *   * The length must be either less than 0x7F (all values accepted),
+     *     or even.
+     */
+    bool rom_aligned = (file->loc & 1) == 0;
+    bool ram_aligned = ((uint32_t)buf & 7) == 0;
+    bool len_aligned = (to_read < 0x7F) || ((to_read & 1) == 0);
+    if (rom_aligned && ram_aligned && len_aligned)
     {
-        /* Do we need to seek? */
-        uint32_t t_sector = sector_from_loc(file->loc);
-        
-        if(t_sector != file->sector_number)
-        {
-            /* Must seek to new sector */
-            if(t_sector > file->sector_number)
-            {
-                /* Easy, just walk forward */
-                walk_sectors(file, t_sector - file->sector_number);
-            }
-            else
-            {
-                /* Start over, walk all the way */
-                grab_sector(file->start_sector, &file->cur_sector);
-                file->sector_number = 0;
+        /* 16-byte alignment: we can simply invalidate the buffer.
+         * 8-byte alignment: we need to also writeback in case the partial
+         *  cachelines have hot data to write back. */
+        if ((((uint32_t)buf | to_read) & 15) == 0)
+            data_cache_hit_invalidate(buf, to_read);
+        else
+            data_cache_hit_writeback_invalidate(buf, to_read);
 
-                walk_sectors(file, t_sector);
-            }
-        }
+        dma_read((void *)(((uint32_t)buf) & 0x1FFFFFFF),
+            file->cart_start_loc + file->loc, to_read);
 
-        /* Only read as much as we currently have */
-        int read_this_loop = to_read;
-        if(read_this_loop > data_left_in_sector(file->loc))
-        {
-            read_this_loop = data_left_in_sector(file->loc);
-        }
-
-        /* Copy in */
-        memcpy(data, file->cur_sector.data + offset_into_sector(file->loc), read_this_loop);
-        data += read_this_loop;
-        did_read += read_this_loop;
-        file->loc += read_this_loop;
-
-        to_read -= read_this_loop;
+        file->loc += to_read;
+        return to_read;
     }
 
-    /* Return the count */
+    /* Something we can actually increment! */
+    uint8_t *data = buf;
+    const int CACHED_SIZE = sizeof(file->cached_data);
+
+    /* Loop in, reading data in the cached buffer */
+    while(to_read)
+    {
+        /* Check if we need to read into the cached buffer */
+        if (file->loc < file->cached_loc || file->loc >= file->cached_loc+CACHED_SIZE)
+        {
+            /* We need to read from a 8-byte aligned location, so calculate it */
+            file->cached_loc = file->loc & ~7;
+
+            /* Invalidate the cached data. No need to writeback here because
+               CACHE_SIZE is a multiple of 16 bytes and the data is aligned,
+               so the cachelines are not shared with other variables. */
+            data_cache_hit_invalidate(file->cached_data, CACHED_SIZE);
+
+            dma_read((void *)(((uint32_t)file->cached_data) & 0x1FFFFFFF),
+                file->cart_start_loc + file->cached_loc, CACHED_SIZE);
+        }
+
+        /* Pull as much data as we can from the current buffer */
+        int copy = file->cached_loc+CACHED_SIZE - file->loc;
+        if (copy > to_read)
+            copy = to_read;
+
+        memcpy(data, file->cached_data + (file->loc - file->cached_loc), copy);
+
+        file->loc += copy;
+        data += copy;
+        to_read -= copy;
+        did_read += copy;
+    }
+
     return did_read;
 }
 
@@ -1055,6 +1044,44 @@ int dfs_size(uint32_t handle)
     }
 
     return file->size;
+}
+
+/**
+ * @brief Return the physical address of a file (in ROM space)
+ *
+ * This function should be used for highly-specialized, high-performance
+ * use cases. Using dfs_open / dfs_read is generally acceptable
+ * performance-wise, and is easier to use rather than managing
+ * direct access to PI space.
+ * 
+ * Direct access to ROM data must go through io_read or dma_read. Do not
+ * dereference directly as the console might hang if the PI is busy.
+ *
+ * @param[in] path
+ *            Name of the file
+ *
+ * @return A pointer to the physical address of the file body, or 0
+ *         if the file was not found.
+ * 
+ */
+uint32_t dfs_rom_addr(const char *path)
+{
+    /* Try to find file */
+    directory_entry_t *dirent;
+    int ret = recurse_path(path, WALK_OPEN, &dirent, TYPE_FILE);
+
+    if(ret != DFS_ESUCCESS)
+    {
+        /* File not found, or other error */
+        return 0;
+    }
+
+    /* We now have the pointer to the file entry */
+    directory_entry_t t_node;
+    grab_sector(dirent, &t_node);
+
+    /* Return the starting location in ROM */
+    return get_start_location(&t_node);
 }
 
 /**
@@ -1101,7 +1128,10 @@ static void *__open( char *name, int flags )
     dfs_chdir("/");
 
     /* We disregard flags here */
-    return (void *)dfs_open( name );
+    int handle = dfs_open( name );
+    if (handle <= 0)
+        return NULL;
+    return (void *)handle;
 }
 
 /**
@@ -1272,6 +1302,31 @@ static filesystem_t dragon_fs = {
 };
 
 /**
+ * @brief Verify that the current emulator is compatible with DFS, and assert
+ *        if it is not.
+ */
+static void __dfs_check_emulation(void)
+{
+    const uint32_t ROM_ADDR = 0x10000000;
+
+    uint32_t data = io_read(ROM_ADDR);
+    
+    /* DFS requires working support for short DMA transfers. Verify that they
+     * work and if they don't, assert out. */
+    uint8_t buf[4] __attribute__((aligned(8))) = { 0xFF, 0xFF, 0xFF, 0xFF };
+    data_cache_hit_writeback_invalidate(buf, 4);
+    dma_read(buf, ROM_ADDR, 3);
+
+    if (buf[0] == ((data >> 24) & 0xFF) &&
+        buf[1] == ((data >> 16) & 0xFF) &&
+        buf[2] == ((data >> 8) & 0xFF) &&
+        buf[3] == 0xFF)
+        return;
+
+    assertf(0, "Your emulator is not accurate enough to run this ROM.\nSpecifically, it doesn't support accurate PI DMA");
+}
+
+/**
  * @brief Initialize the filesystem.
  *
  * Given a base offset where the filesystem should be found, this function will
@@ -1288,6 +1343,9 @@ static filesystem_t dragon_fs = {
  */
 int dfs_init(uint32_t base_fs_loc)
 {
+    /* Detect if we are running on emulator accurate enough to emulate DragonFS. */
+    __dfs_check_emulation();
+
     /* Try normal (works on doctor v64) */
     int ret = __dfs_init( base_fs_loc );
 

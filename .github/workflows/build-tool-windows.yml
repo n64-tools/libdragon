@@ -21,7 +21,7 @@ jobs:
             mingw-w64-${{ matrix.arch }}-libpng
             base-devel
             mingw-w64-${{ matrix.arch }}-toolchain
-          update: true
+          update: false
 
       - uses: actions/checkout@v3
         with:
@@ -38,7 +38,46 @@ jobs:
           make ${{ matrix.build }}
 
       - name: "Upload ${{ matrix.build }} executables"
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: windows-${{ matrix.arch }}-${{ matrix.build }}
           path: ${{ github.workspace }}/**/tools/**/*.exe
+
+  Generate-Windows-Tools-Release:
+    runs-on: ubuntu-latest
+    needs: [Build-Tools-Windows]
+    steps:
+      - name: Download x86_64 Windows artifact
+        id: download-x86_64-windows-artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: "windows-x86_64-tools"
+          path: ${{ runner.temp }}/windows-artifact-download/windows-x86_64-tools
+
+      - name: Download i686 Windows artifact
+        id: download-i686-windows-artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: "windows-i686-tools"
+          path: ${{ runner.temp }}/windows-artifact-download/windows-i686-tools
+
+      # Compress and move the folders ready for upload.
+      - name: Compress and move windows artifacts
+        run: |
+          cd ${{ steps.download-x86_64-windows-artifact.outputs.download-path }}
+          zip -r -q ${{ runner.temp }}/libdragon-tools-win_x86_64.zip *
+
+          cd ${{ steps.download-i686-windows-artifact.outputs.download-path }}
+          zip -r -q ${{ runner.temp }}/libdragon-tools-win_i686.zip *
+        continue-on-error: true
+
+      - name: Generate Pre-Release
+        if: github.event_name != 'pull_request'
+        uses: softprops/action-gh-release@v1
+        with:
+          draft: true
+          prerelease: true
+          name: "${{ github.ref_name }}-windows-tools-latest"
+          tag_name: "${{ github.ref_name }}-windows-tools-latest"
+          files: |
+            ${{ runner.temp }}/**/*.zip

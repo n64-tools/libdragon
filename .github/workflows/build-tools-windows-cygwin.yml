@@ -13,15 +13,15 @@ jobs:
       fail-fast: false
       matrix:
         include: [
-          { arch: x86_64, build: tools},
-          { arch: x86,   build: tools}
+          { arch: x86_64, host: x86_64-w64-mingw32 build: tools} # ,
+          # { arch: x86, build: tools}
         ]
 
     steps:
-      - name: Download cygwin
-        uses: cygwin/cygwin-install-action@master
-        with:
-          platform: ${{ matrix.arch }}
+      - name: Install x-compile system build dependencies
+#        if: ${{ matrix.target-platform == 'Windows-x86_64' }}
+        run: |
+          sudo apt-get install -y mingw-w64
 
       - uses: actions/checkout@v3
         with:
@@ -29,7 +29,11 @@ jobs:
 
       - name: Build ${{ matrix.build }}
         run: |
-          make ${{ matrix.build }}
+          cd tools
+          ./configure \
+          --build="$BUILD" \
+          --host="$HOST"
+          make # ${{ matrix.build }}
 
       - name: "Upload ${{ matrix.build }} executables"
         uses: actions/upload-artifact@v3

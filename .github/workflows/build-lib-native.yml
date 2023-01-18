@@ -1,13 +1,13 @@
 # Copyright (c) N64-Tools, NetworkFusion and contributers 2023
 # See LICENSE file in the project root for full license information.
 
-name: Test Debian Package
+name: Build lib using Debian Package
 
 on:
   workflow_call:
 
 jobs:
-  build-and-test:
+  build-lib-native:
     runs-on: ubuntu-latest
 
     steps:

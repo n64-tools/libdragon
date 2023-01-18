@@ -21,7 +21,7 @@ jobs:
       - name: Install x-compile system build dependencies
         # if: ${{ matrix.target-platform == 'Windows-x86_64' }}
         run: |
-          sudo apt-get install -y mingw-w64
+          sudo apt-get install -y mingw-w64 libpng-dev
 
       - uses: actions/checkout@v3
         with:

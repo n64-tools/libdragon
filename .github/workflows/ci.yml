@@ -11,7 +11,7 @@ jobs:
   #   secrets:
   #     token: ${{ secrets.GITHUB_TOKEN }}
 
-  Build-Tools-Windows-msys2:
+  Build-Tools-Windows:
     uses: ./.github/workflows/build-tool-windows.yml
 
   # Build-Documentation:

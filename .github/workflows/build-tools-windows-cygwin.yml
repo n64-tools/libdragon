@@ -29,9 +29,6 @@ jobs:
 
       - name: Build ${{ matrix.build }}
         run: |
-          cd tools
-          # ./configure \
-          
           CC=${{ matrix.host }}-gcc make ${{ matrix.build }}
 
       - name: "Upload ${{ matrix.build }} executables"

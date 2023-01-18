@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Install x-compile system build dependencies
-#        if: ${{ matrix.target-platform == 'Windows-x86_64' }}
+        # if: ${{ matrix.target-platform == 'Windows-x86_64' }}
         run: |
           sudo apt-get install -y mingw-w64
 

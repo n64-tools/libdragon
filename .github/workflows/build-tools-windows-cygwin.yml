@@ -1,0 +1,38 @@
+# Copyright (c) N64-Tools, NetworkFusion and contributers 2023
+# See LICENSE file in the project root for full license information.
+
+name: Build windows tools using cygwin
+
+on:
+  workflow_call:
+
+jobs:
+  build-lib-native:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include: [
+          { arch: x86_64, build: tools},
+          { arch: x86,   build: tools}
+        ]
+
+    steps:
+      - name: Download cygwin
+        uses: cygwin/cygwin-install-action@master
+        with:
+          platform: ${{ matrix.arch }}
+
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 1 # Using a shallow checkout. Change to `0` if a full fetch is required.
+
+      - name: Build ${{ matrix.build }}
+        run: |
+          make ${{ matrix.build }}
+
+      - name: "Upload ${{ matrix.build }} executables"
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-${{ matrix.arch }}-${{ matrix.build }}-cygwin
+          path: ${{ github.workspace }}/**/tools/**/*.exe

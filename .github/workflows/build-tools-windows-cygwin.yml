@@ -30,10 +30,9 @@ jobs:
       - name: Build ${{ matrix.build }}
         run: |
           cd tools
-          ./configure \
-          --build="$BUILD" \
-          --host="$HOST"
-          make # ${{ matrix.build }}
+          # ./configure \
+          
+          make # ${{ matrix.build }} --host=${{ matrix.host }}
 
       - name: "Upload ${{ matrix.build }} executables"
         uses: actions/upload-artifact@v3

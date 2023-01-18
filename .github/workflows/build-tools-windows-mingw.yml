@@ -14,14 +14,27 @@ jobs:
       matrix:
         include: [
           { arch: x86_64, host: x86_64-w64-mingw32, build: tools} # ,
-          # { arch: x86, build: tools}
+          # { arch: i686, host: i686-w64-mingw32, build: tools}
         ]
 
     steps:
       - name: Install x-compile system build dependencies
-        # if: ${{ matrix.target-platform == 'Windows-x86_64' }}
         run: |
-          sudo apt-get install -y mingw-w64 mingw-w64-x86_64-libpng
+          sudo apt-get install -y mingw-w64 libz-mingw-w64-dev libpng-dev
+
+      - name: x-compile libpng
+        run: |
+          # mkdir libpng-src
+          wget -c https://github.com/glennrp/libpng/archive/refs/tags/v1.6.28.tar.gz -O - | tar -xz # -C ./libpng-src
+          # ls -R
+          # cd libpng-src/libpng-1.6.28/
+          cd libpng-1.6.28/
+          ./configure --host=${{ matrix.build }} \
+                      --prefix=/usr/${{ matrix.build }} \
+                      CPPFLAGS=-I/usr/${{ matrix.build }}/include \
+                      LDFLAGS=-L/usr/${{ matrix.build }}/lib
+          make
+          sudo make install    
 
       - uses: actions/checkout@v3
         with:

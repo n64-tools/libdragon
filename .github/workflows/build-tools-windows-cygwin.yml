@@ -32,7 +32,7 @@ jobs:
           cd tools
           # ./configure \
           
-          make # ${{ matrix.build }} --host=${{ matrix.host }}
+          CC=${{ matrix.host }}-gcc make ${{ matrix.build }}
 
       - name: "Upload ${{ matrix.build }} executables"
         uses: actions/upload-artifact@v3

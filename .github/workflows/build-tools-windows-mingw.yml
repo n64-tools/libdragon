@@ -1,7 +1,7 @@
 # Copyright (c) N64-Tools, NetworkFusion and contributers 2023
 # See LICENSE file in the project root for full license information.
 
-name: Build windows tools using cygwin
+name: Build windows tools using mingw
 
 on:
   workflow_call:
@@ -27,13 +27,13 @@ jobs:
           # mkdir libpng-src
           wget -c https://github.com/glennrp/libpng/archive/refs/tags/v1.6.28.tar.gz -O - | tar -xz # -C ./libpng-src
           # ls -R
-          # cd libpng-src/libpng-1.6.28/
+          # cd libpng-src/libpng-1.6.28/scripts
           cd libpng-1.6.28/
           ./configure --host=${{ matrix.build }} \
                       --prefix=/usr/${{ matrix.build }} \
                       CPPFLAGS=-I/usr/${{ matrix.build }}/include \
                       LDFLAGS=-L/usr/${{ matrix.build }}/lib
-          make
+          make -F makefile.gcc
           sudo make install    
 
       - uses: actions/checkout@v3
@@ -47,5 +47,5 @@ jobs:
       - name: "Upload ${{ matrix.build }} executables"
         uses: actions/upload-artifact@v3
         with:
-          name: windows-${{ matrix.arch }}-${{ matrix.build }}-cygwin
+          name: windows-${{ matrix.arch }}-${{ matrix.build }}-mingw
           path: ${{ github.workspace }}/**/tools/**/*.exe

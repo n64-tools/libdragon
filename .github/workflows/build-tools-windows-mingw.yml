@@ -33,7 +33,7 @@ jobs:
           #             --prefix=/usr/${{ matrix.build }} \
           #             CPPFLAGS=-I/usr/${{ matrix.build }}/include \
           #             LDFLAGS=-L/usr/${{ matrix.build }}/lib
-          make -F ./scripts/makefile.msys
+          make -f ./scripts/makefile.msys
           sudo make install
 
       - uses: actions/checkout@v3

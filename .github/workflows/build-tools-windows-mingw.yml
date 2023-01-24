@@ -20,21 +20,21 @@ jobs:
     steps:
       - name: Install x-compile system build dependencies
         run: |
-          sudo apt-get install -y mingw-w64 libz-mingw-w64-dev libpng-dev
+          sudo apt-get install -y mingw-w64 libz-mingw-w64-dev
 
       - name: x-compile libpng
         run: |
           # mkdir libpng-src
-          wget -c https://github.com/glennrp/libpng/archive/refs/tags/v1.6.28.tar.gz -O - | tar -xz # -C ./libpng-src
+          wget -c https://github.com/glennrp/libpng/archive/refs/tags/v1.6.39.tar.gz -O - | tar -xz # -C ./libpng-src
           # ls -R
-          # cd libpng-src/libpng-1.6.28/scripts
-          cd libpng-1.6.28/
+          # cd libpng-src/libpng-1.6.39/scripts
+          cd libpng-1.6.39/
           ./configure --host=${{ matrix.build }} \
                       --prefix=/usr/${{ matrix.build }} \
                       CPPFLAGS=-I/usr/${{ matrix.build }}/include \
                       LDFLAGS=-L/usr/${{ matrix.build }}/lib
-          make -F makefile.gcc
-          sudo make install    
+          make -F ./scripts/makefile.gcc
+          sudo make install
 
       - uses: actions/checkout@v3
         with:

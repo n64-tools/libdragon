@@ -7,15 +7,15 @@ jobs:
   Build-library-native:
     uses: ./.github/workflows/build-lib-native.yml
 
-  Build-Tools-Windows-msys2:
-    uses: ./.github/workflows/build-tools-windows-msys2.yml
+  # Build-Tools-Windows-msys2:
+  #   uses: ./.github/workflows/build-tools-windows-msys2.yml
 
-  # Build-Tools-Windows-mingw:
-  #   uses: ./.github/workflows/build-tools-windows-mingw.yml
+  Build-Tools-Windows-mingw:
+    uses: ./.github/workflows/build-tools-windows-mingw.yml
 
   Generate-Windows-Tools-Release:
     runs-on: ubuntu-latest
-    needs: [Build-Tools-Windows-msys2, Build-library-native] # Build-Tools-Windows-mingw
+    needs: [Build-Tools-Windows-mingw, Build-library-native] # Build-Tools-Windows-msys2
     steps:
       - name: Download x86_64 Windows artifact
         id: download-x86_64-windows-artifact

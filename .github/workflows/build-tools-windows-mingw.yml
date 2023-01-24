@@ -29,11 +29,11 @@ jobs:
           # ls -R
           # cd libpng-src/libpng-1.6.39/scripts
           cd libpng-1.6.39/
-          ./configure --host=${{ matrix.build }} \
-                      --prefix=/usr/${{ matrix.build }} \
-                      CPPFLAGS=-I/usr/${{ matrix.build }}/include \
-                      LDFLAGS=-L/usr/${{ matrix.build }}/lib
-          make -F ./scripts/makefile.gcc
+          # ./configure --host=${{ matrix.build }} \
+          #             --prefix=/usr/${{ matrix.build }} \
+          #             CPPFLAGS=-I/usr/${{ matrix.build }}/include \
+          #             LDFLAGS=-L/usr/${{ matrix.build }}/lib
+          make -F ./scripts/makefile.msys
           sudo make install
 
       - uses: actions/checkout@v3
